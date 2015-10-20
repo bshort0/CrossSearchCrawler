@@ -1,0 +1,16 @@
+{
+	"siteTitle": "ACM Digital Library",
+	"searchURL": "http://dl.acm.org/results.cfm",
+	"searchFields": [
+					{"and":"allofem"},
+					{"or":"anyofem"},
+					{"not":"noneofem"},
+					{"author's keywords":"keyword"}
+					],
+	"yearFilter":[{"from":"since_year"},{"to":"before_year"}],
+	"resultItemList":"",
+	"resultItem":[{"link":"citation.cfm?"}],
+	"resultsPerPage":"",
+	"pageNumber":"",
+	"numberOfResults":""
+}
