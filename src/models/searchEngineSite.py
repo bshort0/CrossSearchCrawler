@@ -1,9 +1,6 @@
 __author__ = 'Ryan'
 
 
-import json
-
-
 class SearchEngineSite:
 	"""
 	This is an object that contains a definition of a site to search from.
@@ -36,7 +33,3 @@ class SearchEngineSite:
 	        soup = BeautifulSoup(response.text, "html.parser")
 	        print("\n\n\n====================\n\n")
 	        print(soup.prettify().encode('utf8'))
-
-
-def parseSearchEngineJSON(definitionFilePath):
-	pass
