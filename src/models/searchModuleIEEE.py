@@ -1,8 +1,9 @@
 __author__ = 'Ryan'
 
 
-from requests import session
+import requests
 from bs4 import BeautifulSoup
+from models.searchQuery import SearchQuery
 
 
 class IEEESearchEngine:
@@ -101,36 +102,45 @@ class IEEESearchEngine:
 	"""
 	def executeSearch(self, query):
 		self.params['queryText'] = query
-        response = requests.get(self.url, self.params)
-        # Get a beautiful soup object for this page
-        return BeautifulSoup(response.text)
+		response = requests.get(self.url, self.params)
+		print("URL: " + response.url)
+		# Get a beautiful soup object for this page
+		soup = BeautifulSoup(response.text, "html.parser")
+		return soup
 
 
-    """
-    Parses the result page from an executed search.
+	"""
+	Parses the result page from an executed search.
 
-    Params: 
-    	resultPage: a parsed BeautifulSoup object of the results page of a search
-    	searchParams: the search params that were used for this search
+	Params: 
+	resultPage: a parsed BeautifulSoup object of the results page of a search
+	searchParams: the search params that were used for this search
 
-    Returns:
-    	a searchQuery object that is able to recreate the exact search, 
-    	and represents the results of the search
-    """
-    def parseResults(self, resultPage, searchParams):
-    	searchQuery = searchQuery(self, searchParams)
-    	resultItems = []
-    	# TODO: Get the result items from the soup object and populate the list with three-tuples
-    	for node in resultPage.findall(attrs={'class': 'article-list-item'}):
-    		print("Found an item")
+	Returns:
+	a searchQuery object that is able to recreate the exact search, 
+	and represents the results of the search
+	"""
+	def parseResults(self, resultPage, searchParams):
 
-    	# r is a three-tuple (title, authors, ID)
-    	for r in resultItems:
-    		if r in self.globalResults:
-    			# TODO: Check this syntax with python sets
-    			searchQuery.addResultItem(self.globalResults.get(r))
-    		else:
-    			self.globalResults.add(r)
-    			searchQuery.addResultItem(r)
+		# print(resultPage.prettify().encode('utf8'))
 
-    	return searchQuery
+		search = SearchQuery(self, searchParams)
+		resultItems = []
+
+		if resultPage == None:
+			print("result Page is none")
+
+		# TODO: Get the list items somehow
+		for node in resultPage.find_all(attrs={'class' : 'article-list-item ng-scope'}):
+			print("Found an item")
+
+		# r is a three-tuple (title, authors, ID)
+		for r in resultItems:
+			if r in self.globalResults:
+				# TODO: Check this syntax with python sets
+				search.addResultItem(self.globalResults.get(r))
+			else:
+				self.globalResults.add(r)
+				search.addResultItem(r)
+
+		return search

@@ -21,5 +21,5 @@ class SearchQuery:
 
 	def addResultItem(self, result):
 		self.results.append(result)
-		self.numResults++
+		self.numResults += 1
 

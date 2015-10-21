@@ -1,5 +1,6 @@
 from requests import session
 from bs4 import BeautifulSoup
+from models.searchModuleIEEE import *
 import sys
 
 
@@ -33,12 +34,39 @@ def parseFlags(options):
             print("Improper flag syntax: " + flag)
 
 
+"""
+Assumes that the input file is of proper format.
+"""
+def parseSearchTermsFile(filepath):
+    f = open(filepath)
+    searchTerms = {}
+
+    contents = ""
+    for line in f:
+        contents += line.strip() + "\n"
+
+    contents = contents.strip()
+
+    # split on the double lines in the file
+    groups = contents.split("\n\n")
+
+    for g in groups:
+        lines = g.split("\n")
+        groupName = lines[0].strip(":")
+        lines = lines[1::]
+
+        searchTerms[groupName] = []
+        for l in lines:
+            searchTerms[groupName].append(l)
+
+    return searchTerms
+
 def main():
     if len(sys.argv) > 1:
         parseFlags(sys.argv[1::])
         searchTerms = parseSearchTermsFile(flags['searchTermsPath'])
-	    searchMod = searchModuleIEEE(searchTerms, results)
-
+        searchMod = IEEESearchEngine(searchTerms, results)
+        searchMod.run()
     else:
         print("Incorrect number of arguments. Get help.\n")
 

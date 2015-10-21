@@ -1,0 +1,7 @@
+effectiveness:
+false positive rate
+true positive rate
+
+performance:
+memory usage
+throughput
