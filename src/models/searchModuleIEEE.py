@@ -33,7 +33,7 @@ class IEEESearchEngine:
 	def __init__(self, searchTerms, globalResults):
 		self.url = "http://ieeexplore.ieee.org/search/searchresult.jsp"
 		self.params = { "action" : "search", \
-						"searchField" : "Search_All", \
+						"searchField" : "Search_All_Text", \
 						"matchBoolean" : "true", \
 						"queryText" : "", \
 						"refinements" : ["4291944822", "4291944246"], \
@@ -41,6 +41,58 @@ class IEEESearchEngine:
 						"rowsPerPage" : "100000" \
 					  }
 		self.searchTerms = searchTerms
+		self.globalResults = globalResults
+		self.executedQueries = []
+
+
+	"""
+	Crafts search queries for this module.
+	Executes those search queries on the IEEE site.
+	Records the results.
+	"""
+	def run(self):
+		queries = self.craftQueries()
+		for q in queries:
+			resultPage = self.executeSearch(q)
+			searchQuery = self.parseResults(resultPage, self.params)
+			self.executedQueries.append(searchQuery)
+
+
+	"""
+	Crafts a set of queries to execute for this specific site.
+	"""
+	def craftQueries(self):
+		queries = []
+		groupStrings = []
+
+		andStr = " AND "
+		orStr = " OR "
+		quotChar = ".QT."
+		intrusionDetectionString = "(" + quotChar + "Intrusion Detection System" + quotChar + ")"
+
+		# Create query strings for each group of search terms
+		for key in self.searchTerms.keys():
+			groupString = "("
+			for term in self.searchTerms[key]:
+				groupString += quotChar + term + quotChar + orStr
+			groupString += ")"
+			groupStrings.append(groupString)
+
+		fullQuery = "(" + intrusionDetectionString
+
+		# Craft query strings of "intrusion detection" and "group1" and "group2"
+		for i in range(0, len(groupStrings)):
+			# Create a fullQuery that involves every group
+			fullQuery += groupStrings[i] + andStr
+			for j in range(0, len(groupStrings)):
+				query = "(" + intrusionDetectionString + andStr + groupStrings[i] + andStr + groupStrings[j] + ")"
+				queries.append(query)
+
+		fullQuery += ")"
+		queries.append(fullQuery)
+
+		return queries
+
 
 	"""
 	Executes a search for the given query
@@ -51,4 +103,34 @@ class IEEESearchEngine:
 		self.params['queryText'] = query
         response = requests.get(self.url, self.params)
         # Get a beautiful soup object for this page
-        return BeautifulSoup(response.text, "html.parser")
+        return BeautifulSoup(response.text)
+
+
+    """
+    Parses the result page from an executed search.
+
+    Params: 
+    	resultPage: a parsed BeautifulSoup object of the results page of a search
+    	searchParams: the search params that were used for this search
+
+    Returns:
+    	a searchQuery object that is able to recreate the exact search, 
+    	and represents the results of the search
+    """
+    def parseResults(self, resultPage, searchParams):
+    	searchQuery = searchQuery(self, searchParams)
+    	resultItems = []
+    	# TODO: Get the result items from the soup object and populate the list with three-tuples
+    	for node in resultPage.findall(attrs={'class': 'article-list-item'}):
+    		print("Found an item")
+
+    	# r is a three-tuple (title, authors, ID)
+    	for r in resultItems:
+    		if r in self.globalResults:
+    			# TODO: Check this syntax with python sets
+    			searchQuery.addResultItem(self.globalResults.get(r))
+    		else:
+    			self.globalResults.add(r)
+    			searchQuery.addResultItem(r)
+
+    	return searchQuery

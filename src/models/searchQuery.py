@@ -17,4 +17,9 @@ class SearchQuery:
 		self.searchModule = searchModule
 		self.searchParams = searchParams
 		self.results = []
+		self.numResults = 0
+
+	def addResultItem(self, result):
+		self.results.append(result)
+		self.numResults++
 
