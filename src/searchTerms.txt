@@ -1,6 +1,6 @@
 effectiveness:
-false positive rate
-true positive rate
+false positive
+true positive
 
 performance:
 memory usage

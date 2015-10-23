@@ -54,6 +54,7 @@ class IEEESearchEngine:
 	def run(self):
 		queries = self.craftQueries()
 		for q in queries:
+			print("Query: " + q)
 			resultPage = self.executeSearch(q)
 			searchQuery = self.parseResults(resultPage, self.params)
 			self.executedQueries.append(searchQuery)
@@ -69,28 +70,26 @@ class IEEESearchEngine:
 		andStr = " AND "
 		orStr = " OR "
 		quotChar = ".QT."
-		intrusionDetectionString = "(" + quotChar + "Intrusion Detection System" + quotChar + ")"
+		intrusionDetectionString = quotChar + "Intrusion detection system" + quotChar
 
 		# Create query strings for each group of search terms
 		for key in self.searchTerms.keys():
-			groupString = "("
-			for term in self.searchTerms[key]:
-				groupString += quotChar + term + quotChar + orStr
-			groupString += ")"
+			groupString = ""
+			for i in range(0, len(self.searchTerms[key])):
+				if groupString == "":
+					groupString = "(" + quotChar + self.searchTerms[key][i] + quotChar + ")"
+				else:
+					groupString = "(" + groupString + orStr + quotChar + self.searchTerms[key][i] + quotChar + ")"
 			groupStrings.append(groupString)
-
-		fullQuery = "(" + intrusionDetectionString
 
 		# Craft query strings of "intrusion detection" and "group1" and "group2"
 		for i in range(0, len(groupStrings)):
 			# Create a fullQuery that involves every group
-			fullQuery += groupStrings[i] + andStr
-			for j in range(0, len(groupStrings)):
+			singleQuery = "(" + groupStrings[i] + andStr + intrusionDetectionString + ")"
+			queries.append(singleQuery)
+			for j in range((i+1), len(groupStrings)):
 				query = "(" + intrusionDetectionString + andStr + groupStrings[i] + andStr + groupStrings[j] + ")"
 				queries.append(query)
-
-		fullQuery += ")"
-		queries.append(fullQuery)
 
 		return queries
 
@@ -102,8 +101,9 @@ class IEEESearchEngine:
 	"""
 	def executeSearch(self, query):
 		self.params['queryText'] = query
-		response = requests.get(self.url, self.params)
+		response = requests.get(self.url, params=self.params)
 		print("URL: " + response.url)
+		print("Text: " + response.text)
 		# Get a beautiful soup object for this page
 		soup = BeautifulSoup(response.text, "html.parser")
 		return soup
@@ -131,7 +131,7 @@ class IEEESearchEngine:
 			print("result Page is none")
 
 		# TODO: Get the list items somehow
-		for node in resultPage.find_all(attrs={'class' : 'article-list-item ng-scope'}):
+		for node in resultPage.find_all("li"):
 			print("Found an item")
 
 		# r is a three-tuple (title, authors, ID)
