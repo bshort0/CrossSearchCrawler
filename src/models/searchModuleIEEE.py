@@ -4,6 +4,11 @@ __author__ = 'Ryan'
 import requests
 from bs4 import BeautifulSoup
 from models.searchQuery import SearchQuery
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import os
 
 
 class IEEESearchEngine:
@@ -100,12 +105,26 @@ class IEEESearchEngine:
 	Returns: a parsed beautiful soup page of the results page.
 	"""
 	def executeSearch(self, query):
+
 		self.params['queryText'] = query
-		response = requests.get(self.url, params=self.params)
-		print("URL: " + response.url)
-		print("Text: " + response.text)
+
+		chromeDriver = "C:\\Users\\Ryan\\Documents\\Fall2015\\research\\CrossSearchCrawler\\chromedriver_win32\\chromedriver.exe"
+		os.environ["webdriver.chrome.driver"] = chromeDriver
+		browser = webdriver.Chrome(chromeDriver)
+		requestUrl = requests.get(self.url, params=self.params).url
+		browser.get(requestUrl)
+
+		try:
+			element = WebDriverWait(browser, 10).until(
+				EC.presence_of_element_located((By.CLASS_NAME, "article-list-item"))
+			)
+			print("Passed the wait")
+			soup = BeautifulSoup(browser.page_source, "html.parser")
+			print(soup.renderContents())
+		finally:
+			browser.quit()
+
 		# Get a beautiful soup object for this page
-		soup = BeautifulSoup(response.text, "html.parser")
 		return soup
 
 

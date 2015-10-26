@@ -1,4 +1,0 @@
-
-URL: http://ieeexplore.ieee.org:80/search/searchresult.jsp?reload=true&searchField=Search_All_Text&matchBoolean=true&queryText=%28%28.QT.Intrusion+Detection+System.QT.%29+AND+%28.QT.memory+usage.QT.+OR+.QT.throughput.QT.+OR+%29+AND+%28.QT.false+positive+rate.QT.+OR+.QT.true+positive+rate.QT.+OR+%29%29&refinements=4291944822&refinements=4291944246&action=search&rowsPerPage=100000&ranges=2009_2016_Year
-
-URL: http://ieeexplore.ieee.org/search/searchresult.jsp?action=search&sortType=&rowsPerPage=&searchField=Search_All_Text&matchBoolean=true&queryText=((.QT.Intrusion%20Detection%20System.QT.)%20AND%20.QT.memory%20usage.QT.)&refinements=4291944822&refinements=4291944246&ranges=2009_2016_Year
