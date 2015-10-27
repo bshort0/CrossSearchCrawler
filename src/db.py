@@ -29,7 +29,25 @@ class DBManager:
 
 
 	def putSearch(self, search):
-		pass
+		exists = False
+
+		# Check if this search has been inserted yet
+		idSql = "SELECT id FROM searches WHERE searchText=%s AND site=%s;" %(search['query'], search['site'])
+		self.cursor.execute(idSql)
+		results = self.cursor.fetchall()
+		if len(results) > 0:
+			exists = True
+
+		# If it doesn't exist, insert it
+		if not exists:
+			sql = "INSERT INTO searches (searchText, site) VALUES ( %s, %s);" %(search['query'], search['site'])
+			self.cursor.execute(sql)
+
+		# Get the ID
+		self.cursor.execute(idSql)
+		idVal = self.cursor.fetchone()
+
+		return idVal
 
 
 	def putEntry(self, entry):

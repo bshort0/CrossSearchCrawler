@@ -56,11 +56,7 @@ def parseFile(filePath):
             pass
 
     firstLine = contents[0]
-    # Parse the first line to get the search query
-    # 0 = url
-    # 1 = date accessed
-    # 2 = Search Query
-    searchDetails = parseCSVLine(firstLine, ['url', 'date', 'query'])
+    searchDetails = parseCSVLine(firstLine, ['url', 'date', 'query', 'site'])
 
     headerLine = contents[1]
     fieldNames = headerLine.replace('"', '').strip().split(',')
