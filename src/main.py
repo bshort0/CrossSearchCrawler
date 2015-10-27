@@ -80,15 +80,12 @@ def main():
         path = sys.argv[1]
         # Should be path to a directory
         files = [ join(path, f) for f in listdir(path) if isfile(join(path, f)) ]
+        
+        db = DBManager()
 
         for f in files:
             searchDetails, entries = parseFile(f)
-            for row in entries:
-                print(row)
-
-        # FINALLY!!! Have parsed CSV. Now relate to search and put into database.
-
-        db = DBManager()
+            db.putSearchResults(searchDetails, entries)
         
 
     else:

@@ -19,3 +19,22 @@ class DBManager:
 						]
 		for command in tableCommands:
 			self.cursor.execute(command)
+
+	def putSearchResults(self, searchDetails, entries):
+
+		searchID = putSearch(searchDetails)
+		for entry in entries:
+			entryID = self.putEntry(entry)
+			self.putSearchLink(searchID, entryID)
+
+
+	def putSearch(self, search):
+		pass
+
+
+	def putEntry(self, entry):
+		pass
+
+
+	def putSearchLink(self, searchID, entryID):
+		pass
