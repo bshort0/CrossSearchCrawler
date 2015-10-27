@@ -2,6 +2,8 @@
 import sys
 from db import DBManager
 from csv import DictReader
+from os import listdir
+from os.path import isfile, join
 
 """
 Assumes that the input file is of proper format.
@@ -37,35 +39,52 @@ def parseCSVLine(line, headerNames):
 
     return entry
 
+def parseFile(filePath):
+    csvFile = open(filePath, encoding='utf-8').read()
+
+    contents = []
+    currentLine = ""
+    for char in csvFile:
+        if is_ascii(char):
+            if char == "\n":
+                currentLine += char
+                contents.append(currentLine)
+                currentLine = ""
+            else:
+                currentLine += char
+        else:
+            pass
+
+    firstLine = contents[0]
+    # Parse the first line to get the search query
+    # 0 = url
+    # 1 = date accessed
+    # 2 = Search Query
+    searchDetails = parseCSVLine(firstLine, ['url', 'date', 'query'])
+
+    headerLine = contents[1]
+    fieldNames = headerLine.replace('"', '').strip().split(',')
+
+    contents = contents[2::]
+
+    entries = []
+    for line in contents:
+        entry = parseCSVLine(line, fieldNames)
+        entries.append(entry)
+
+    return searchDetails, entries
+
 
 def main():
     if len(sys.argv) > 1:
         path = sys.argv[1]
-        csvFile = open(path, encoding='utf-8').read()
+        # Should be path to a directory
+        files = [ join(path, f) for f in listdir(path) if isfile(join(path, f)) ]
 
-        contents = []
-        currentLine = ""
-        for char in csvFile:
-            if is_ascii(char):
-                if char == "\n":
-                    currentLine += char
-                    contents.append(currentLine)
-                    currentLine = ""
-                else:
-                    currentLine += char
-            else:
-                pass
-
-        firstLine = contents[0]
-        headerLine = contents[1]
-        fieldNames = headerLine.replace('"', '').strip().split(',')
-
-        contents = contents[2::]
-
-        entries = []
-        for line in contents:
-            entry = parseCSVLine(line, fieldNames)
-            entries.append(entry)
+        for f in files:
+            searchDetails, entries = parseFile(f)
+            for row in entries:
+                print(row)
 
         # FINALLY!!! Have parsed CSV. Now relate to search and put into database.
 
