@@ -37,6 +37,9 @@ def parseCSVLine(line, headerNames):
         else:
             currentItem += char
 
+    # Add on the last item
+    entry[headerNames[i]] = currentItem
+
     return entry
 
 def parseFile(filePath):
@@ -47,7 +50,6 @@ def parseFile(filePath):
     for char in csvFile:
         if is_ascii(char):
             if char == "\n":
-                currentLine += char
                 contents.append(currentLine)
                 currentLine = ""
             else:
@@ -55,7 +57,7 @@ def parseFile(filePath):
         else:
             pass
 
-    firstLine = contents[0]
+    firstLine = contents[0].strip().strip(',')
     searchDetails = parseCSVLine(firstLine, ['url', 'date', 'query', 'site'])
 
     headerLine = contents[1]
@@ -82,6 +84,9 @@ def main():
         for f in files:
             searchDetails, entries = parseFile(f)
             db.putSearchResults(searchDetails, entries)
+
+
+        db.shutdown()
         
 
     else:
