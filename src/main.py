@@ -83,8 +83,17 @@ def main():
 
         for f in files:
             searchDetails, entries = parseFile(f)
+            print("Number of entries: " + str(len(entries)))
             db.putSearchResults(searchDetails, entries)
 
+        searches = db.getSearches()
+
+        for i in range(0, (len(searches)-1)):
+            for j in range((i+1), len(searches)):
+                results = db.getOverlappingResults(searches[i][0], searches[j][0])
+                print("Number of searches from search %i: %i" % (i, len(db.getSearchResults(searches[i][0]))))
+                print("Number of searches from search %i: %i" % (j, len(db.getSearchResults(searches[j][0]))))
+                print("Overlap between search %i and search %i is: %i" % (i, j, len(results)))
 
         db.shutdown()
         

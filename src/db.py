@@ -5,6 +5,7 @@ class DBManager:
 	def __init__(self, connection="searches.db"):
 		self.conn = sqlite3.connect(connection)
 		self.cursor = self.conn.cursor()
+		self.count = 0
 
 		self.initializeTables()
 
@@ -53,11 +54,14 @@ class DBManager:
 	def putEntry(self, entry):
 		exists = False
 
-		idSql = 'SELECT id FROM publications WHERE title="%s" AND year="%s" AND doi="%s"' % (entry['Document Title'], entry['Year'], entry['DOI'])
+		idSql = 'SELECT id FROM publications WHERE title="%s" AND year="%s" AND doi="%s" AND isbn="%s" AND issn="%s"' % (entry['Document Title'], entry['Year'], entry['DOI'], entry["ISBN"], entry["ISSN"])
 		self.cursor.execute(idSql)
 		results = self.cursor.fetchall()
 
 		if len(results) > 0:
+			print("Length of results checking if pub exists: " + str(len(results)))
+			self.count += 1
+			print("Number of exists: " + str(self.count))
 			exists = True
 
 		if not exists:
@@ -80,6 +84,37 @@ class DBManager:
 		if not exists:
 			putSql = 'INSERT INTO searchpublink (searchID, pubID) VALUES ("%s", "%s");' % (searchID, entryID)
 			self.cursor.execute(putSql)
+
+
+	def getSearches(self):
+		sql = "SELECT id, searchText from searches;"
+		self.cursor.execute(sql)
+
+		return self.cursor.fetchall()
+
+
+	def getSearchResults(self, searchID):
+		sql = "SELECT pubID from searchpublink where searchID=%s;" % (searchID)
+		self.cursor.execute(sql)
+		results = self.cursor.fetchall()
+
+		return results
+
+	"""
+	Returns a list of publication IDs that are mapped to both searchIDs in searchpublink
+	"""
+	def getOverlappingResults(self, searchID1, searchID2):
+
+		results1 = self.getSearchResults(searchID1)
+
+		results2 = self.getSearchResults(searchID2)
+
+		results = []
+		for r in results1:
+			if r in results2:
+				results.append(r)
+
+		return results
 
 
 	def shutdown(self):
