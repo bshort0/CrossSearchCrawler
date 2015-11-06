@@ -39,6 +39,11 @@ def parseCSVLine(line, headerNames):
 
     # Add on the last item
     entry[headerNames[i]] = currentItem
+    i += 1
+
+    while i < len(headerNames):
+        entry[headerNames[i]] = ""
+        i += 1
 
     return entry
 

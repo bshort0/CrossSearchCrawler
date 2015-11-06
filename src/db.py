@@ -62,6 +62,7 @@ class DBManager:
 			print("Length of results checking if pub exists: " + str(len(results)))
 			self.count += 1
 			print("Number of exists: " + str(self.count))
+			print(entry['Document Title'])
 			exists = True
 
 		if not exists:
