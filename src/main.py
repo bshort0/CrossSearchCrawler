@@ -48,7 +48,7 @@ def parseCSVLine(line, headerNames):
     return entry
 
 def parseFile(filePath):
-    csvFile = open(filePath, encoding='utf-8').read()
+    csvFile = open(filePath, mode="r", errors="ignore").read()
 
     contents = []
     currentLine = ""
@@ -57,6 +57,8 @@ def parseFile(filePath):
             if char == "\n":
                 contents.append(currentLine)
                 currentLine = ""
+            elif char == '\t':
+                currentLine += ","
             else:
                 currentLine += char
         else:
@@ -77,18 +79,49 @@ def parseFile(filePath):
 
     return searchDetails, entries
 
+def zoteroToIEEE(zoteroEntries):
+
+    transfers = {"Title" : "Document Title", "Author" : "Authors", "URL" : "PDF Link", "Publication Year" : "Year"}
+    converted = []
+
+    
+    for entry in zoteroEntries:
+        newEntry = {}
+        for k in entry.keys():
+            if k in transfers.keys():
+                newEntry[transfers[k]] = entry[k]
+            else:
+                newEntry[k] = entry[k]
+        converted.append(newEntry)
+
+    return converted
+
+
 
 def main():
     if len(sys.argv) > 1:
+
+        db = DBManager()
+
         path = sys.argv[1]
         # Should be path to a directory
         files = [ join(path, f) for f in listdir(path) if isfile(join(path, f)) ]
+
+        taggedPath = "../zoteroExport/taggedPapers.CSV"
+        notApplicablePath = "../zoteroExport/notApplicable.CSV"
+
+        tagSearchDetail, taggedEntries = parseFile(taggedPath)
+        naSearchDetail, naEntries = parseFile(notApplicablePath)
+
+        taggedEntries = zoteroToIEEE(taggedEntries)
+        naEntries = zoteroToIEEE(naEntries)
         
-        db = DBManager()
+        db.putSearchResults(tagSearchDetail, taggedEntries)
+        db.putSearchResults(naSearchDetail, naEntries)
 
         for f in files:
             searchDetails, entries = parseFile(f)
-            print("Number of entries: " + str(len(entries)))
+            # print("Number of entries: " + str(len(entries)))
             db.putSearchResults(searchDetails, entries)
 
         searches = db.getSearches()
@@ -96,9 +129,9 @@ def main():
         for i in range(0, (len(searches)-1)):
             for j in range((i+1), len(searches)):
                 results = db.getOverlappingResults(searches[i][0], searches[j][0])
-                print("Number of searches from search %i: %i" % (i, len(db.getSearchResults(searches[i][0]))))
-                print("Number of searches from search %i: %i" % (j, len(db.getSearchResults(searches[j][0]))))
-                print("Overlap between search %i and search %i is: %i" % (i, j, len(results)))
+                print("Number of searches from search %s: %i" % (searches[i][1], len(db.getSearchResults(searches[i][0]))))
+                print("Number of searches from search %s: %i" % (searches[j][1], len(db.getSearchResults(searches[j][0]))))
+                print("Overlap between search %s and search %s is: %i" % (searches[i][1], searches[j][1], len(results)))
 
         db.shutdown()
         

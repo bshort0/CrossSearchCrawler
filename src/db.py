@@ -5,7 +5,6 @@ class DBManager:
 	def __init__(self, connection="searches.db"):
 		self.conn = sqlite3.connect(connection)
 		self.cursor = self.conn.cursor()
-		self.count = 0
 
 		self.initializeTables()
 
@@ -59,10 +58,6 @@ class DBManager:
 		results = self.cursor.fetchall()
 
 		if len(results) > 0:
-			print("Length of results checking if pub exists: " + str(len(results)))
-			self.count += 1
-			print("Number of exists: " + str(self.count))
-			print(entry['Document Title'])
 			exists = True
 
 		if not exists:
