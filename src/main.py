@@ -1,8 +1,8 @@
 
 import sys
+import os
 from db import DBManager
 from csv import DictReader
-from os import listdir
 from os.path import isfile, join
 
 """
@@ -105,8 +105,13 @@ def main():
 
         path = sys.argv[1]
         # Should be path to a directory
-        files = [ join(path, f) for f in listdir(path) if isfile(join(path, f)) ]
+        filePaths = []
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                filePaths.append(root + os.sep + f)
+                print(root + os.sep + f)
 
+        
         taggedPath = "../zoteroExport/taggedPapers.CSV"
         notApplicablePath = "../zoteroExport/notApplicable.CSV"
 
@@ -119,7 +124,7 @@ def main():
         db.putSearchResults(tagSearchDetail, taggedEntries)
         db.putSearchResults(naSearchDetail, naEntries)
 
-        for f in files:
+        for f in filePaths:
             searchDetails, entries = parseFile(f)
             # print("Number of entries: " + str(len(entries)))
             db.putSearchResults(searchDetails, entries)
