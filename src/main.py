@@ -1,19 +1,12 @@
 
 import sys
 import os
+import csv
 from db import DBManager
 from csv import DictReader
 from os.path import isfile, join
 
-"""
-Assumes that the input file is of proper format.
-"""
-def parseSearchResults(filePath):
-    pass
 
-
-def generateReport(dbManager):
-    pass
 
 
 def is_ascii(s):
@@ -97,50 +90,85 @@ def zoteroToIEEE(zoteroEntries):
     return converted
 
 
+def generateReport(db):
+    
+    listTable = []
+    searches = db.getSearches()
+
+    firstLine = ['Total', 'Total']
+    for s in searches:
+        firstLine.append(s[1])
+
+    listTable.append(firstLine)
+
+    secondLine = ['Total', '']
+    for s in searches:
+        secondLine.append(str(len(db.getSearchResults(s[0]))))
+
+    listTable.append(secondLine)
+
+    for s in searches:
+        line = [s[1], str(len(db.getSearchResults(s[0])))]
+        for other in searches:
+            line.append(str(len(db.getOverlappingResults(s[0], other[0]))))
+        listTable.append(line)
+
+    return listTable
+
+
+def reportToCSV(report):
+
+    content = ""
+    for line in report:
+        for s in line:
+            content += s + ","
+        content += "\n"
+
+    return content
+
 
 def main():
     if len(sys.argv) > 1:
 
         db = DBManager()
 
-        path = sys.argv[1]
-        # Should be path to a directory
-        filePaths = []
-        for root, dirs, files in os.walk(path):
-            for f in files:
-                filePaths.append(root + os.sep + f)
-                print(root + os.sep + f)
+        command = sys.argv[1]
 
+        if command == "report":
+            report = generateReport(db)
+            report = reportToCSV(report)
+            print(report)
+
+        elif command == "load":
+
+            path = sys.argv[2]
+            # Should be path to a directory
+            filePaths = []
+            for root, dirs, files in os.walk(path):
+                for f in files:
+                    filePaths.append(root + os.sep + f)
+
+            taggedPath = "../zoteroExport/taggedPapers.CSV"
+            notApplicablePath = "../zoteroExport/notApplicable.CSV"
+
+            tagSearchDetail, taggedEntries = parseFile(taggedPath)
+            naSearchDetail, naEntries = parseFile(notApplicablePath)
+
+            taggedEntries = zoteroToIEEE(taggedEntries)
+            naEntries = zoteroToIEEE(naEntries)
+            
+            db.putSearchResults(tagSearchDetail, taggedEntries)
+            db.putSearchResults(naSearchDetail, naEntries)
+
+            for f in filePaths:
+                searchDetails, entries = parseFile(f)
+                db.putSearchResults(searchDetails, entries)
+
+        else: 
+            print("Incorrect arguments. Only 'report' and 'load' are currently supported.")
         
-        taggedPath = "../zoteroExport/taggedPapers.CSV"
-        notApplicablePath = "../zoteroExport/notApplicable.CSV"
-
-        tagSearchDetail, taggedEntries = parseFile(taggedPath)
-        naSearchDetail, naEntries = parseFile(notApplicablePath)
-
-        taggedEntries = zoteroToIEEE(taggedEntries)
-        naEntries = zoteroToIEEE(naEntries)
-        
-        db.putSearchResults(tagSearchDetail, taggedEntries)
-        db.putSearchResults(naSearchDetail, naEntries)
-
-        for f in filePaths:
-            searchDetails, entries = parseFile(f)
-            # print("Number of entries: " + str(len(entries)))
-            db.putSearchResults(searchDetails, entries)
-
-        searches = db.getSearches()
-
-        for i in range(0, (len(searches)-1)):
-            for j in range((i+1), len(searches)):
-                results = db.getOverlappingResults(searches[i][0], searches[j][0])
-                print("Number of searches from search %s: %i" % (searches[i][1], len(db.getSearchResults(searches[i][0]))))
-                print("Number of searches from search %s: %i" % (searches[j][1], len(db.getSearchResults(searches[j][0]))))
-                print("Overlap between search %s and search %s is: %i" % (searches[i][1], searches[j][1], len(results)))
-
         db.shutdown()
         
-
     else:
         print("Incorrect arguments.")
 
