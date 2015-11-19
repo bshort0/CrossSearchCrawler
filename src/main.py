@@ -169,6 +169,7 @@ def resultsFileToLists(filePath):
     for char in csvFile:
         if is_ascii(char):
             if char == "\n":
+                currentLine = validateCSVLine(currentLine)
                 contents.append(currentLine)
                 currentLine = ""
             elif char == '\t':
@@ -182,6 +183,40 @@ def resultsFileToLists(filePath):
     contents = contents[2::]
 
     return contents
+
+
+# Removes meaningless quotes to make sure the line matches CSV standard
+def validateCSVLine(line):
+
+    # Start with the first character
+    newLine = line[0]
+
+    if newLine == '"':
+        quoteCount = 1
+    else:
+        quoteCount = 0
+
+    for i in range(1, (len(line)-1)):
+        char = line[i]
+        lastChar = line[(i-1)]
+        nextChar = line[(i+1)]        
+
+        if char == '"':
+            quoteCount += 1
+            if nextChar == ',' and (quoteCount % 2) == 0:
+                newLine += char
+            elif lastChar == ',' and quoteCount == 1:
+                newLine += char
+        elif char == ',' and (quoteCount % 2) == 0:
+            quoteCount = 0
+            newLine += char
+        else:
+            newLine += char
+
+    if line[(len(line)-1)] == '"':
+        newLine += '"'
+
+    return newLine
 
     
 def main():
