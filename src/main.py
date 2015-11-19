@@ -76,12 +76,14 @@ def zoteroToIEEE(zoteroEntries):
     transfers = {"Title" : "Document Title", "Author" : "Authors", "URL" : "PDF Link", "Publication Year" : "Year"}
     converted = []
 
-    
     for entry in zoteroEntries:
         newEntry = {}
         for k in entry.keys():
             if k in transfers.keys():
                 newEntry[transfers[k]] = entry[k]
+            elif k == "Pages":
+                newEntry["Start Page"] = entry[k].split("-")[0]
+                newEntry["End Page"] = entry[k].split("-")[1]
             else:
                 newEntry[k] = entry[k]
         converted.append(newEntry)

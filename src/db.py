@@ -72,6 +72,7 @@ class DBManager:
 			self.putAuthorPubLink(authorID, idVal[0])
 
 		return idVal[0]
+		
 
 	def putAuthor(self, authorName):
 		exists = False
