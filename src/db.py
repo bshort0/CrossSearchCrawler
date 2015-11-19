@@ -10,7 +10,7 @@ class DBManager:
 
 	def initializeTables(self):
 		tableCommands = ['''CREATE TABLE IF NOT EXISTS authors (id INTEGER PRIMARY KEY, name text)''', \
-						 '''CREATE TABLE IF NOT EXISTS publications (id INTEGER PRIMARY KEY, title text, year text, doi text, isbn text, issn text)''', \
+						 '''CREATE TABLE IF NOT EXISTS publications (id INTEGER PRIMARY KEY, title text, year text, doi text, isbn text, issn text, url text, startpage text, endpage text)''', \
 						 '''CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY, name text)''', \
 						 '''CREATE TABLE IF NOT EXISTS authorpublink (authorID INTEGER, pubID INTEGER)''', \
 						 '''CREATE TABLE IF NOT EXISTS tagpublink (tagID INTEGER, pubID INTEGER)''', \
@@ -53,7 +53,7 @@ class DBManager:
 	def putEntry(self, entry):
 		exists = False
 
-		idSql = 'SELECT id FROM publications WHERE title="%s" AND year="%s" AND doi="%s" AND isbn="%s" AND issn="%s"' % (entry['Document Title'], entry['Year'], entry['DOI'], entry["ISBN"], entry["ISSN"])
+		idSql = 'SELECT id FROM publications WHERE title="%s" AND year="%s" AND doi="%s" AND isbn="%s" AND issn="%s" AND url="%s" AND startpage="%s" AND endpage="%s"' % (entry['Document Title'], entry['Year'], entry['DOI'], entry["ISBN"], entry["ISSN"], entry["PDF Link"], entry["Start Page"], entry["End Page"])
 		self.cursor.execute(idSql)
 		results = self.cursor.fetchall()
 
@@ -61,9 +61,34 @@ class DBManager:
 			exists = True
 
 		if not exists:
-			sql = 'INSERT INTO publications (title, year, doi, isbn, issn) VALUES ("%s", "%s", "%s", "%s", "%s");' % (entry['Document Title'], entry['Year'], entry['DOI'], entry['ISBN'], entry['ISSN'])
+			sql = 'INSERT INTO publications (title, year, doi, isbn, issn, url, startpage, endpage) VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s");' % (entry['Document Title'], entry['Year'], entry['DOI'], entry['ISBN'], entry['ISSN'], entry["PDF Link"], entry["Start Page"], entry["End Page"])
 			self.cursor.execute(sql)
 
+		self.cursor.execute(idSql)
+		idVal = self.cursor.fetchone()
+
+		for author in entry["Authors"].split(";"):
+			authorID = self.putAuthor(author)
+			self.putAuthorPubLink(authorID, idVal[0])
+
+		return idVal[0]
+
+	def putAuthor(self, authorName):
+		exists = False
+
+		# Check if this search has been inserted yet
+		idSql = 'SELECT id FROM authors WHERE name="%s";' %(authorName)
+		self.cursor.execute(idSql)
+		results = self.cursor.fetchall()
+		if len(results) > 0:
+			exists = True
+
+		# If it doesn't exist, insert it
+		if not exists:
+			sql = 'INSERT INTO authors(name) VALUES ("%s");' %(authorName)
+			self.cursor.execute(sql)
+
+		# Get the ID
 		self.cursor.execute(idSql)
 		idVal = self.cursor.fetchone()
 
@@ -79,6 +104,18 @@ class DBManager:
 
 		if not exists:
 			putSql = 'INSERT INTO searchpublink (searchID, pubID) VALUES ("%s", "%s");' % (searchID, entryID)
+			self.cursor.execute(putSql)
+
+	def putAuthorPubLink(self, authorID, pubID):
+		exists = False
+		idSql = 'SELECT authorID, pubID FROM authorpublink WHERE authorID="%s" AND pubID="%s";' % (authorID, pubID)
+		self.cursor.execute(idSql)
+		results = self.cursor.fetchall()
+		if len(results) > 0:
+			exists = True
+
+		if not exists:
+			putSql = 'INSERT INTO authorpublink (authorID, pubID) VALUES ("%s", "%s");' % (authorID, pubID)
 			self.cursor.execute(putSql)
 
 
