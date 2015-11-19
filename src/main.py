@@ -17,22 +17,23 @@ def parseCSVLine(line, headerNames):
     entry = {}
     i = 0
     currentItem = ""
-    openQuote = False
+    openQuoteCount = 0
+    lastChar = ""
     for char in line:
-        if char == ',' and not openQuote:
+        if char == ',' and openQuoteCount == 0:
             entry[headerNames[i]] = currentItem
             i += 1
             currentItem = ""
-        elif char == '"' and not openQuote:
-            openQuote = True
-        elif char == '"' and openQuote:
-            openQuote = False
+        elif char == '"' and (lastChar == '"' or openQuoteCount == 0):
+            openQuoteCount += 1
+        elif char == '"':
+            openQuoteCount -= 1
         else:
             currentItem += char
+        lastChar = char
 
     # Add on the last item
     entry[headerNames[i]] = currentItem
-    i += 1
 
     while i < len(headerNames):
         entry[headerNames[i]] = ""
@@ -64,7 +65,7 @@ def parseFile(filePath):
     fieldNames = headerLine.replace('"', '').strip().split(',')
 
     contents = contents[2::]
-
+    
     entries = []
     for line in contents:
         entry = parseCSVLine(line, fieldNames)
@@ -127,6 +128,62 @@ def reportToCSV(report):
     return content
 
 
+def linesToCSV(report):
+
+    content = ""
+    for line in report:
+        content += line + "\n"
+
+    return content
+
+
+def getCSVHeader(filePath):
+    csvFile = open(filePath, mode="r", errors="ignore").read()
+
+    lineCount = 0
+    contents = []
+    currentLine = ""
+    for char in csvFile:
+        if is_ascii(char) and lineCount < 2:
+            if char == "\n":
+                contents.append(currentLine)
+                lineCount += 1
+                currentLine = ""
+            elif char == '\t':
+                currentLine += ","
+            else:
+                currentLine += char
+        else:
+            break
+
+    header = contents[0].strip().strip(',') + "\n" + contents[1].replace('"', '').strip().strip(",")
+
+    return header
+
+
+def resultsFileToLists(filePath):
+    csvFile = open(filePath, mode="r", errors="ignore").read()
+
+    contents = []
+    currentLine = ""
+    for char in csvFile:
+        if is_ascii(char):
+            if char == "\n":
+                contents.append(currentLine)
+                currentLine = ""
+            elif char == '\t':
+                currentLine += ","
+            else:
+                currentLine += char
+        else:
+            pass
+
+    # Remove the first two lines which should be the header
+    contents = contents[2::]
+
+    return contents
+
+    
 def main():
     if len(sys.argv) > 1:
 
@@ -138,6 +195,29 @@ def main():
             report = generateReport(db)
             report = reportToCSV(report)
             print(report)
+
+        elif command == "compile-folder":
+
+            path = sys.argv[2]
+            outputFile = sys.argv[3]
+
+            filePaths = []
+            for root, dirs, files in os.walk(path):
+                for f in files:
+                    filePaths.append(root + os.sep + f)
+
+            finalEntries = []
+            header = getCSVHeader(filePaths[0])
+            finalEntries.append(header)
+            for f in filePaths:
+                entries = resultsFileToLists(f)
+                finalEntries += entries
+
+            contents = linesToCSV(finalEntries)
+
+            outFile = open(outputFile, 'w')
+            outFile.write(contents)
+            outFile.close()
 
         elif command == "load":
 

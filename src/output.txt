@@ -1,35 +1,12 @@
-../IEEEsearchResults\IEEEbaseSearch.csv
-../IEEEsearchResults\physicalIDS.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Alexa.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Blaster.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Clam.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\CSIM.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Darpa98.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\HoneynetTraffic.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\KDD98.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\KDD99.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Kyoto.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Mawilab.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\MITLL.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Parsec.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Spec2006.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\UNMFirefox.csv
-../IEEEsearchResults\BenchmarkSearches\Keyword\Void11.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\FalseNegative.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\FalsePositive.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\Fvalue.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\Precision.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\Recall.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\RelativeError.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\ROC.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\TrueNegative.csv
-../IEEEsearchResults\MetricsSearches\Effectiveness\TruePositive.csv
-../IEEEsearchResults\MetricsSearches\HardwareSpecificPerformance\ComputationalTime.csv
-../IEEEsearchResults\MetricsSearches\HardwareSpecificPerformance\CPUUsage.csv
-../IEEEsearchResults\MetricsSearches\HardwareSpecificPerformance\ScanningTime.csv
-../IEEEsearchResults\MetricsSearches\Performance\MaxResources.csv
-../IEEEsearchResults\MetricsSearches\Performance\MonitoringInterval.csv
-../IEEEsearchResults\MetricsSearches\Performance\ProcessingBandwidth.csv
-../IEEEsearchResults\MetricsSearches\Performance\Slowdown.csv
-../IEEEsearchResults\MetricsSearches\Performance\Throughput.csv
-../IEEEsearchResults\MetricsSearches\Size\LOC.csv
+Parsing file: ../zoteroExport/taggedPapers.CSV
+['Key', 'Item Type', 'Publication Year', 'Author', 'Title', 'Publication Title', 'ISBN', 'ISSN', 'DOI', 'Url', 'Abstract Note', 'Date', 'Date Added', 'Date Modified', 'Access Date', 'Pages', 'Num Pages', 'Issue', 'Volume', 'Number Of Volumes', 'Journal Abbreviation', 'Short Title', 'Series', 'Series Number', 'Series Text', 'Series Title', 'Publisher', 'Place', 'Language', 'Rights', 'Type', 'Archive', 'Archive Location', 'Library Catalog', 'Call Number', 'Extra', 'Notes', 'File Attachments', 'Link Attachments', 'Manual Tags', 'Automatic Tags', 'Editor', 'Series Editor', 'Translator', 'Contributor', 'Attorney Agent', 'Book Author', 'Cast Member', 'Commenter', 'Composer', 'Cosponsor', 'Counsel', 'Interviewer', 'Producer', 'Recipient', 'Reviewed Author', 'Scriptwriter', 'Words By', 'Guest', 'Number', 'Edition', 'Running Time', 'Scale', 'Medium', 'Artwork Size', 'Filing Date', 'Application Number', 'Assignee', 'Issuing Authority', 'Country', 'Meeting Name', 'Conference Name', 'Court', 'References', 'Reporter', 'Legal Status', 'Priority Numbers', 'Programming Language', 'Version', 'System', 'Code', 'Code Number', 'Section', 'Session', 'Committee', 'History', 'Legislative Body']
+Parsing file: ../zoteroExport/notApplicable.CSV
+['Key', 'Item Type', 'Publication Year', 'Author', 'Title', 'Publication Title', 'ISBN', 'ISSN', 'DOI', 'Url', 'Abstract Note', 'Date', 'Date Added', 'Date Modified', 'Access Date', 'Pages', 'Num Pages', 'Issue', 'Volume', 'Number Of Volumes', 'Journal Abbreviation', 'Short Title', 'Series', 'Series Number', 'Series Text', 'Series Title', 'Publisher', 'Place', 'Language', 'Rights', 'Type', 'Archive', 'Archive Location', 'Library Catalog', 'Call Number', 'Extra', 'Notes', 'File Attachments', 'Link Attachments', 'Manual Tags', 'Automatic Tags', 'Editor', 'Series Editor', 'Translator', 'Contributor', 'Attorney Agent', 'Book Author', 'Cast Member', 'Commenter', 'Composer', 'Cosponsor', 'Counsel', 'Interviewer', 'Producer', 'Recipient', 'Reviewed Author', 'Scriptwriter', 'Words By', 'Guest', 'Number', 'Edition', 'Running Time', 'Scale', 'Medium', 'Artwork Size', 'Filing Date', 'Application Number', 'Assignee', 'Issuing Authority', 'Country', 'Meeting Name', 'Conference Name', 'Court', 'References', 'Reporter', 'Legal Status', 'Priority Numbers', 'Programming Language', 'Version', 'System', 'Code', 'Code Number', 'Section', 'Session', 'Committee', 'History', 'Legislative Body']
+Parsing file: ../IEEEsearchResults\IEEEbaseSearch.csv
+['Document Title', 'Authors', 'Author Affiliations', 'Publication Title', 'Date Added To Xplore', 'Year', 'Volume', 'Issue', 'Start Page', 'End Page', 'Abstract', 'ISSN', 'ISBN', 'EISBN', 'DOI', 'PDF Link', 'Author Keywords', 'IEEE Terms', 'INSPEC Controlled Terms', 'INSPEC Non-Controlled Terms', 'MeSH Terms', 'Article Citation Count', 'Patent Citation Count', 'Reference Count', 'Copyright Year', 'Online Date', 'Issue Date', 'Meeting Date', 'Publisher', 'Document Identifier', '', '', '']
+Woops
+Woops
+Woops
+Woops
+Woops
+Woops
