@@ -18,19 +18,17 @@ def parseCSVLine(line, headerNames):
     i = 0
     currentItem = ""
     openQuoteCount = 0
-    lastChar = ""
     for char in line:
         if char == ',' and openQuoteCount == 0:
             entry[headerNames[i]] = currentItem
             i += 1
             currentItem = ""
-        elif char == '"' and (lastChar == '"' or openQuoteCount == 0):
+        elif char == '"' and openQuoteCount == 0:
             openQuoteCount += 1
         elif char == '"':
             openQuoteCount -= 1
         else:
             currentItem += char
-        lastChar = char
 
     # Add on the last item
     entry[headerNames[i]] = currentItem
@@ -169,7 +167,7 @@ def resultsFileToLists(filePath):
     for char in csvFile:
         if is_ascii(char):
             if char == "\n":
-                currentLine = validateCSVLine(currentLine)
+                # currentLine = validateCSVLine(currentLine)
                 contents.append(currentLine)
                 currentLine = ""
             elif char == '\t':
