@@ -67,9 +67,28 @@ def parseFile(filePath):
     entries = []
     for line in contents:
         entry = parseCSVLine(line, fieldNames)
-        entries.append(entry)
+        if not containsStopWords(entry):
+            entries.append(entry)
 
     return searchDetails, entries
+
+
+def containsStopWords(entry):
+    stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter', /
+                 'title page', 'program guide', 'program at a glance', 'list of papers']
+
+    if 'Document Title' in entry:
+        title = entry['Document Title'].lower().strip('[]')
+    elif 'Title' in entry:
+        title = entry['Title'].lower().strip('[]')
+    else:
+        title = ""
+        
+    for word in stopWords:
+        if title.startswith(word):
+            return True
+
+    return False
 
 def zoteroToIEEE(zoteroEntries):
 
@@ -169,7 +188,7 @@ def resultsFileToLists(filePath):
     for char in csvFile:
         if is_ascii(char):
             if char == "\n":
-                # currentLine = validateCSVLine(currentLine)
+                currentLine = validateCSVLine(currentLine)
                 contents.append(currentLine)
                 currentLine = ""
             elif char == '\t':
