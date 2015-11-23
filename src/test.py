@@ -100,3 +100,28 @@ class maintests(unittest.TestCase):
 		self.assertTrue(entry['Authors'] == "Ficco, M.; Coppolino, Luigi; Romano, L.")
 		self.assertTrue(entry['DOI'] == "10.1109/LADC.2009.14")
 
+
+
+	"""
+	This test is doing the same thing as test_validateCSVLine1.
+	The only difference is the string value being used for the row.
+	The one used here represents a different special case that must 
+	be handled by the CSV validator.
+	"""
+	def test_validateCSVLine4(self):
+		# Actual row taken from an IEEE CSV file
+		# This particular line has a special case with quotation mark usage
+		row = 'Wireless Intrusion Detection System Using a Lightweight Agent,"Haddadi, F.; Sarram, M.A.","Electr. & Comput. Eng. Dept., Yazd Univ., Yazd, Iran","Computer and Network Technology (ICCNT), 2010 Second International Conference on",20100601,2010,,,84,87,"The exponential growth in wireless network faults, vulnerabilities, and attacks make the Wireless Local Area Network (WLAN) security management a challenging research area. Deficiencies of security methods like cryptography (e.g. WEP) and firewalls, causes the use of more complex security systems, such as Intrusion Detection Systems, to be crucial. In this paper, we present a hybrid wireless intrusion detection system (WIDS). To implement the WIDS, we designed a simple lightweight agent. The proposed agent detect the most destroying and serious attacks; Man-In-The-Middle and Denial-of-Service; with the minimum selected feature set. To evaluate our proposed WIDS and its agent, we collect a complete data-set using open source attack generator softwares. Experimental results show that in comparison with similar systems, in addition of more simplicity, our WIDS provides high performance and precision.",,978-0-7695-4042-9,978-1-4244-6962-8,10.1109/ICCNT.2010.26,http://ieeexplore.ieee.org.ezproxy.rit.edu/stamp/stamp.jsp?arnumber=5474532,Intrusion detection system;Security;Wireless Local Area Network;Wireless network attacks,Communication system security;Computer crime;Computer networks;Computer security;Cryptography;Intrusion detection;Telecommunication traffic;Traffic control;Wireless LAN;Wireless networks,computer network security;cryptography;wireless LAN,cryptography;denial-of-service;firewalls;lightweight agent;man-in-the-middle;open source attack generator softwares;wireless intrusion detection system;wireless local area network security management;wireless network faults,,2,,15,,,23-25 April 2010,,IEEE,IEEE Conference Publications,,,'
+		newRow = main.validateCSVLine(row)
+
+		# Print statements for comparing the difference between the non-validated and validated CSV rows
+		# print()
+		# print("Row1: " + row)
+		# print("Row2: " + newRow)
+
+		entry = main.parseCSVLine(newRow, self.headerNames)
+
+		self.assertTrue(entry['Year'] == '2010')
+		self.assertTrue(entry['Document Title'] == "Wireless Intrusion Detection System Using a Lightweight Agent")
+		self.assertTrue(entry['Authors'] == "Haddadi, F.; Sarram, M.A.")
+		self.assertTrue(entry['DOI'] == "10.1109/ICCNT.2010.26")

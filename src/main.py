@@ -18,20 +18,26 @@ def parseCSVLine(line, headerNames):
     i = 0
     currentItem = ""
     openQuoteCount = 0
-    for char in line:
-        if char == ',' and openQuoteCount == 0:
-            entry[headerNames[i]] = currentItem
-            i += 1
-            currentItem = ""
-        elif char == '"' and openQuoteCount == 0:
-            openQuoteCount += 1
-        elif char == '"':
-            openQuoteCount -= 1
+    char = ""
+    for count in range(0, len(line)):
+        char = line[count]
+        if i < len(headerNames):
+            if char == ',' and openQuoteCount == 0:
+                entry[headerNames[i]] = currentItem
+                i += 1
+                currentItem = ""
+            elif char == '"' and openQuoteCount == 0:
+                openQuoteCount += 1
+            elif char == '"':
+                openQuoteCount -= 1
+            else:
+                currentItem += char
         else:
-            currentItem += char
+            break
 
     # Add on the last item
-    entry[headerNames[i]] = currentItem
+    if char != ',' and i < len(headerNames):
+        entry[headerNames[i]] = currentItem
 
     while i < len(headerNames):
         entry[headerNames[i]] = ""
@@ -241,8 +247,8 @@ def validateCSVLine(line):
         else:
             newLine += char
 
-    if line[(len(line)-1)] == '"':
-        newLine += '"'
+    if line[(len(line)-1)] == '"' or line[(len(line)-1)] == ',':
+        newLine += line[(len(line)-1)]
 
     return newLine
 
