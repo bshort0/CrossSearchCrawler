@@ -14,6 +14,7 @@ def is_ascii(s):
 
 
 def parseCSVLine(line, headerNames):
+    line = validateCSVLine(line)
     entry = {}
     i = 0
     currentItem = ""
@@ -74,8 +75,10 @@ def parseFile(filePath):
 
 
 def containsStopWords(entry):
-    stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter', /
-                 'title page', 'program guide', 'program at a glance', 'list of papers']
+    stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter', \
+                 'title page', 'program guide', 'program at a glance', 'list of papers', \
+                 'technical program', 'author index', 'tutorial', 'conference program', \
+                 'general session', 'front cover', 'keyword index', "- toc"]
 
     if 'Document Title' in entry:
         title = entry['Document Title'].lower().strip('[]')
@@ -83,9 +86,9 @@ def containsStopWords(entry):
         title = entry['Title'].lower().strip('[]')
     else:
         title = ""
-        
+
     for word in stopWords:
-        if title.startswith(word):
+        if title.startswith(word) or title.endswith(word):
             return True
 
     return False
