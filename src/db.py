@@ -170,6 +170,13 @@ class DBManager:
 		return searchesByYear
 
 
+	def getAuthors(self):
+		sql = "SELECT id, name FROM authors;"
+		self.cursor.execute(sql)
+
+		return self.cursor.fetchall()
+
+
 	def getSearchResults(self, searchID):
 		sql = "SELECT pubID from searchpublink where searchID=%s;" % (searchID)
 		self.cursor.execute(sql)

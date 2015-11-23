@@ -177,6 +177,16 @@ def generateReportByYear(db):
     return listTable
 
 
+def generateAuthorReport(db):
+
+    listTable = []
+
+    numAuthors = len(db.getAuthors())
+
+
+    return listTable
+
+
 def reportToCSV(report):
 
     content = ""
@@ -294,8 +304,13 @@ def main():
             report = reportToCSV(report)
             print(report)
 
-        if command == "report-by-year":
+        elif command == "report-by-year":
             report = generateReportByYear(db)
+            report = reportToCSV(report)
+            print(report)
+
+        elif command == "report-by-authors":
+            report = generateAuthorReport(db)
             report = reportToCSV(report)
             print(report)
 
