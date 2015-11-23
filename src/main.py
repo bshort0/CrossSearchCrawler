@@ -95,7 +95,7 @@ def containsStopWords(entry):
 
 def zoteroToIEEE(zoteroEntries):
 
-    transfers = {"Title" : "Document Title", "Author" : "Authors", "URL" : "PDF Link", "Publication Year" : "Year"}
+    transfers = {"Title" : "Document Title", "Author" : "Authors", "Url" : "PDF Link", "Publication Year" : "Year"}
     converted = []
 
     for entry in zoteroEntries:
@@ -104,8 +104,12 @@ def zoteroToIEEE(zoteroEntries):
             if k in transfers.keys():
                 newEntry[transfers[k]] = entry[k]
             elif k == "Pages":
-                newEntry["Start Page"] = entry[k].split("-")[0]
-                newEntry["End Page"] = entry[k].split("-")[1]
+                if "-" in entry[k]:
+                    newEntry["Start Page"] = entry[k].split("-")[0]
+                    newEntry["End Page"] = entry[k].split("-")[1]
+                else:
+                    newEntry["Start Page"] = ""
+                    newEntry["End Page"] = ""
             else:
                 newEntry[k] = entry[k]
         converted.append(newEntry)
