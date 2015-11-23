@@ -14,7 +14,6 @@ def is_ascii(s):
 
 
 def parseCSVLine(line, headerNames):
-    line = validateCSVLine(line)
     entry = {}
     i = 0
     currentItem = ""
@@ -78,7 +77,7 @@ def containsStopWords(entry):
     stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter', \
                  'title page', 'program guide', 'program at a glance', 'list of papers', \
                  'technical program', 'author index', 'tutorial', 'conference program', \
-                 'general session', 'front cover', 'keyword index', "- toc"]
+                 'general session', 'front cover', 'keyword index', "- toc", "book of abstracts"]
 
     if 'Document Title' in entry:
         title = entry['Document Title'].lower().strip('[]')
@@ -170,15 +169,16 @@ def getCSVHeader(filePath):
     contents = []
     currentLine = ""
     for char in csvFile:
-        if is_ascii(char) and lineCount < 2:
-            if char == "\n":
-                contents.append(currentLine)
-                lineCount += 1
-                currentLine = ""
-            elif char == '\t':
-                currentLine += ","
-            else:
-                currentLine += char
+        if lineCount < 2:
+            if is_ascii(char):
+                if char == "\n":
+                    contents.append(currentLine)
+                    lineCount += 1
+                    currentLine = ""
+                elif char == '\t':
+                    currentLine += ","
+                else:
+                    currentLine += char
         else:
             break
 
@@ -214,6 +214,8 @@ def resultsFileToLists(filePath):
 # Removes meaningless quotes to make sure the line matches CSV standard
 def validateCSVLine(line):
 
+    # Replace triple quotes with double quotes
+    line = line.replace('\"\"\"', '\"\"')
     # Start with the first character
     newLine = line[0]
 
@@ -280,6 +282,36 @@ def main():
             outFile.write(contents)
             outFile.close()
 
+        elif command == "cleanse-CSV":
+            """
+            Goes through each file in the directory given,
+            reads each CSV line and validates it, then 
+            rewrites to the file.
+            """
+            path = sys.argv[2]
+
+            filePaths = []
+            for root, dirs, files in os.walk(path):
+                for f in files:
+                    filePaths.append(root + os.sep + f)
+
+            for f in filePaths:
+                print("Fixing: " + f)
+                finalEntries = []
+                header = getCSVHeader(f)
+                finalEntries.append(header)
+                entries = resultsFileToLists(f)
+                finalEntries += entries
+
+                contents = ""
+                for e in finalEntries:
+                    contents += e + "\n"
+
+                with open(f, 'w') as outFile:
+                    outFile.write(contents)
+
+
+
         elif command == "load":
 
             path = sys.argv[2]
@@ -302,6 +334,7 @@ def main():
             db.putSearchResults(naSearchDetail, naEntries)
 
             for f in filePaths:
+                print("Parsing: " + f)
                 searchDetails, entries = parseFile(f)
                 db.putSearchResults(searchDetails, entries)
 
