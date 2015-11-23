@@ -327,8 +327,8 @@ def main():
                 for f in files:
                     filePaths.append(root + os.sep + f)
 
-            taggedPath = "../zoteroExport/taggedPapers.CSV"
-            notApplicablePath = "../zoteroExport/notApplicable.CSV"
+            taggedPath = "../zoteroExport/taggedPapers.csv"
+            notApplicablePath = "../zoteroExport/notApplicable.csv"
 
             tagSearchDetail, taggedEntries = parseFile(taggedPath)
             naSearchDetail, naEntries = parseFile(notApplicablePath)
