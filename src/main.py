@@ -122,7 +122,7 @@ def zoteroToIEEE(zoteroEntries):
     return converted
 
 
-def generateReport(db):
+def generateReportCrossover(db):
     
     listTable = []
     searches = db.getSearches()
@@ -147,13 +147,42 @@ def generateReport(db):
 
     return listTable
 
+def generateReportByYear(db):
+    
+    listTable = []
+
+    years = {}
+    searches = db.getSearchesByYear()
+    keys = searches.keys()
+
+    firstLine = ['Year']
+    for s in keys:
+        firstLine.append(s)
+        for y in searches[s].keys():
+            if y not in years:
+                years[y] = []
+            years[y].append(searches[s][y])
+
+    listTable.append(firstLine)
+
+    yearKeys = sorted(years.keys())
+
+    for y in yearKeys:
+        line = []
+        line.append(y)
+        for count in years[y]:
+            line.append(count)
+        listTable.append(line)
+
+    return listTable
+
 
 def reportToCSV(report):
 
     content = ""
     for line in report:
         for s in line:
-            content += s + ","
+            content += str(s) + ","
         content += "\n"
 
     return content
@@ -260,8 +289,13 @@ def main():
 
         command = sys.argv[1]
 
-        if command == "report":
-            report = generateReport(db)
+        if command == "report-crossover":
+            report = generateReportCrossover(db)
+            report = reportToCSV(report)
+            print(report)
+
+        if command == "report-by-year":
+            report = generateReportByYear(db)
             report = reportToCSV(report)
             print(report)
 

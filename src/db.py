@@ -127,6 +127,49 @@ class DBManager:
 		return self.cursor.fetchall()
 
 
+	"""
+	This function returns a grouping of searches by year.
+
+	The year value is in the publications table. The search query text is in the searches table.
+
+	There is probably a more efficient way to do this in sql but I don't know how to write it.
+	"""
+	def getSearchesByYear(self):
+		searchsql = "SELECT searchText, id from searches;"
+		linksql = "SELECT searchID, pubID from searchpublink;"
+		pubsql = "SELECT id, year from publications;"
+		self.cursor.execute(searchsql)
+		searches = self.cursor.fetchall()
+		self.cursor.execute(linksql)
+		links = self.cursor.fetchall()
+		self.cursor.execute(pubsql)
+		pubs = self.cursor.fetchall()
+
+		years = set()
+		searchesByYear = {}
+		for s in searches:
+			searchesByYear[s[0]] = {}
+			searchID = s[1]
+			pubIDs = []
+			for l in links:
+				if l[0] == searchID:
+					pubIDs.append(l[1])
+			for p in pubs:
+				if p[0] in pubIDs:
+					if p[1] not in searchesByYear[s[0]]:
+						years.add(p[1])
+						searchesByYear[s[0]][p[1]] = 0
+					searchesByYear[s[0]][p[1]] += 1
+
+		for s in searchesByYear.keys():
+			for y in years:
+				if y not in searchesByYear[s]:
+					searchesByYear[s][y] = 0
+
+
+		return searchesByYear
+
+
 	def getSearchResults(self, searchID):
 		sql = "SELECT pubID from searchpublink where searchID=%s;" % (searchID)
 		self.cursor.execute(sql)
