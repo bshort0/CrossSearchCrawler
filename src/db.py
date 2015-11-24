@@ -177,6 +177,33 @@ class DBManager:
 		return self.cursor.fetchall()
 
 
+	def getSearchesToAuthorCount(self):
+		authPubSql = "SELECT authorID, pubID FROM authorpublink;"
+		searchPubSql = "SELECT searchID, pubID FROM searchpublink;"
+
+		self.cursor.execute(authPubSql)
+		authLinks = self.cursor.fetchall()
+
+		self.cursor.execute(searchPubSql)
+		searchLinks = self.cursor.fetchall()
+
+		searches = self.getSearches()
+
+		searchCounts = {}
+		for s in searches:
+			searchCounts[s[1]] = set()
+			for link in searchLinks:
+				if link[0] == s[0]:
+					for auth in authLinks:
+						if link[1] == auth[1]:
+							searchCounts[s[1]].add(auth[0])
+
+		for key in searchCounts.keys():
+			searchCounts[key] = len(searchCounts[key])
+
+		return searchCounts
+
+
 	def getSearchResults(self, searchID):
 		sql = "SELECT pubID from searchpublink where searchID=%s;" % (searchID)
 		self.cursor.execute(sql)

@@ -182,8 +182,19 @@ def generateAuthorReport(db):
     listTable = []
 
     numAuthors = len(db.getAuthors())
+    searchCounts = db.getSearchesToAuthorCount()
 
+    searches = searchCounts.keys()
 
+    firstLine = ['Search', 'Total']
+    secondLine = ['Num Authors', numAuthors]
+    for s in searches:
+        firstLine.append(s)
+        secondLine.append(searchCounts[s])
+
+    listTable.append(firstLine)
+    listTable.append(secondLine)
+    
     return listTable
 
 
