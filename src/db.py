@@ -9,16 +9,10 @@ class DBManager:
 		self.initializeTables()
 
 	def initializeTables(self):
-		tableCommands = ['''CREATE TABLE IF NOT EXISTS authors (id INTEGER PRIMARY KEY, name text)''', \
-						 '''CREATE TABLE IF NOT EXISTS publications (id INTEGER PRIMARY KEY, title text, year text, doi text, isbn text, issn text, url text, startpage text, endpage text)''', \
-						 '''CREATE TABLE IF NOT EXISTS tags (id INTEGER PRIMARY KEY, name text)''', \
-						 '''CREATE TABLE IF NOT EXISTS authorpublink (authorID INTEGER, pubID INTEGER)''', \
-						 '''CREATE TABLE IF NOT EXISTS tagpublink (tagID INTEGER, pubID INTEGER)''', \
-						 '''CREATE TABLE IF NOT EXISTS searches (id INTEGER PRIMARY KEY, searchText text, site text)''', \
-						 '''CREATE TABLE IF NOT EXISTS searchpublink (searchID INTEGER, pubID INTEGER)'''
-						]
-		for command in tableCommands:
-			self.cursor.execute(command)
+		
+		commands = open('sql_commands.sql', 'r').read()
+		
+		self.cursor.executescript(commands)
 
 	def putSearchResults(self, searchDetails, entries):
 
@@ -53,7 +47,7 @@ class DBManager:
 	def putEntry(self, entry):
 		exists = False
 
-		idSql = 'SELECT id FROM publications WHERE title="%s" AND year="%s" AND doi="%s" AND isbn="%s" AND issn="%s" AND url="%s" AND startpage="%s" AND endpage="%s"' % (entry['Document Title'], entry['Year'], entry['DOI'], entry["ISBN"], entry["ISSN"], entry["PDF Link"], entry["Start Page"], entry["End Page"])
+		idSql = 'SELECT id FROM publications WHERE title="%s" AND year="%s" AND doi="%s" AND isbn="%s" AND issn="%s"' % (entry['Document Title'], entry['Year'], entry['DOI'], entry["ISBN"], entry["ISSN"])
 		self.cursor.execute(idSql)
 		results = self.cursor.fetchall()
 
