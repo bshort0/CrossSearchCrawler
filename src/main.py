@@ -7,7 +7,13 @@ from db import DBManager
 import reports
 import parse
 
+"""
+Utility function to get file paths for every
+file in this directory and subdirectories.
 
+Assumes that the path that is passed in is a
+valid path to a directory.
+"""
 def getFilePaths(folderPath):
     filepaths = []
     for root, dirs, files in os.walk(folderPath):
@@ -17,13 +23,24 @@ def getFilePaths(folderPath):
     return filepaths
 
 
+"""
+Loads the two files from the golden set of tagged 
+papers and not applicable papers.
+
+Paths to the two files are set as default parameters
+so that they can be changed when called, if needed.
+"""
 def loadGoldenSet(db, taggedPath = "../zoteroExport/taggedPapers.csv", notApplicablePath = "../zoteroExport/notApplicable.csv"):
 
+    # Ensure that each file exists
     if isfile(taggedPath):
         if isfile(notApplicablePath):
             tagSearchDetail, taggedEntries = parse.parseFile(taggedPath)
             naSearchDetail, naEntries = parse.parseFile(notApplicablePath)
 
+            # Convert the CSV entries to have IEEE headers
+            # Because they were exported from Zotero, some header names
+            # are different
             taggedEntries = parse.zoteroToIEEE(taggedEntries)
             naEntries = parse.zoteroToIEEE(naEntries)
             
@@ -37,6 +54,13 @@ def loadGoldenSet(db, taggedPath = "../zoteroExport/taggedPapers.csv", notApplic
         # print that the tagged path isn't there
 
 
+"""
+Load a folder of csv files into the database.
+
+Iterates on all of the files from the 'folderPath' directory
+as well as files from subdirectories. For each file, calls the
+function 'loadFile' on it.
+"""
 def loadFolder(db, folderPath):
 
     if isdir(folderPath):
@@ -47,6 +71,9 @@ def loadFolder(db, folderPath):
         pass
 
 
+"""
+Loads a single file into the database.
+"""
 def loadFile(db, filePath):
 
     if isfile(filePath):
@@ -58,6 +85,10 @@ def loadFile(db, filePath):
         # Throw an error or something
     
 
+
+"""
+The command-line interface for the program.
+"""
 def main():
     if len(sys.argv) > 1:
 
@@ -104,20 +135,19 @@ def main():
             outFile.close()
 
         elif command == "validateCSV":
-            """
-            Goes through each file in the directory given,
-            reads each CSV line and validates it, then 
-            rewrites to the file.
-            """
-
+            # For a given directory path,
+            # traverses through each file and ensures
+            # that they each follow valid CSV format
             path = sys.argv[2]
             if isfile(path):
+                # If a file path was given, only cleanse that file
                 contents = parse.validateCSVfile(f)
                 
                 with open(f, 'w') as outFile:
                     outFile.write(contents)
 
             elif isdir(path):
+                # If a directory path was given, traverse all the files
                 filePaths = getFilePaths(path)
                 for f in filePaths:
                     contents = parse.validateCSVfile(f)
@@ -128,9 +158,10 @@ def main():
                 pass
 
         elif command == "load":
-
+            # Loads an entire folder of CSV files and the golden set 
+            # into the database
+            
             path = sys.argv[2]
-            # Should be path to a directory
             loadFolder(db, path)
             loadGoldenSet(db)
 
