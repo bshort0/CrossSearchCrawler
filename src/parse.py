@@ -230,6 +230,21 @@ def validateCSVfile(filePath):
 	return contents
 
 
+def compileFolder(filePaths):
+
+	finalEntries = []
+
+	header = parse.getCSVHeader(filePaths[0])
+	finalEntries.append(header)
+	for f in filePaths:
+		entries = parse.resultsFileToLists(f)
+		finalEntries += entries
+
+	contents = parse.linesToCSV(finalEntries)
+
+	return contents
+
+
 def main():
 	pass
 	

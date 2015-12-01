@@ -85,16 +85,19 @@ def main():
             path = sys.argv[2]
             outputFile = sys.argv[3]
 
-            filePaths = getFilePaths(path)
+            filePaths = []
+            if isdir(path):
+                filePaths = getFilePaths(path)
+            else:
+                pass
+                # throw error or something
 
-            finalEntries = []
-            header = parse.getCSVHeader(filePaths[0])
-            finalEntries.append(header)
-            for f in filePaths:
-                entries = parse.resultsFileToLists(f)
-                finalEntries += entries
-
-            contents = parse.linesToCSV(finalEntries)
+            contents = ""
+            if len(filePaths) > 0:
+                contents = parse.compileFolder(filePaths)
+            else:
+                pass
+                # throw error or something
 
             outFile = open(outputFile, 'w')
             outFile.write(contents)
