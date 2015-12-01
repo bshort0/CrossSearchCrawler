@@ -1,12 +1,54 @@
 
 import sys
 import os
-from os.path import isfile, join
+from os.path import isfile, isfolder, join
 
 from db import DBManager
 import reports
 import parse
+
+
+def loadGoldenSet(db, taggedPath = "../zoteroExport/taggedPapers.csv", notApplicablePath = "../zoteroExport/notApplicable.csv"):
+
+    if isfile(taggedPath):
+        if isfile(notApplicablePath):
+            tagSearchDetail, taggedEntries = parse.parseFile(taggedPath)
+            naSearchDetail, naEntries = parse.parseFile(notApplicablePath)
+
+            taggedEntries = parse.zoteroToIEEE(taggedEntries)
+            naEntries = parse.zoteroToIEEE(naEntries)
+            
+            db.putSearchResults(tagSearchDetail, taggedEntries)
+            db.putSearchResults(naSearchDetail, naEntries)
+        else:
+            pass
+            # Print that the na path isn't there
+    else:
+        pass
+        # print that the tagged path isn't there
+
+
+def loadFolder(db, folderPath):
+
+    if isfolder(folderPath):
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                loadFile(db, root + os.sep + f)
+    else:
+        pass
+
+
+def loadFile(db, filePath):
+
+    if isfile(filePath):
+        print("Loading: " + f)
+        searchDetails, entries = parse.parseFile(f)
+        db.putSearchResults(searchDetails, entries)
+    else:
+        pass
+        # Throw an error or something
     
+
 def main():
     if len(sys.argv) > 1:
 
@@ -84,27 +126,9 @@ def main():
 
             path = sys.argv[2]
             # Should be path to a directory
-            filePaths = []
-            for root, dirs, files in os.walk(path):
-                for f in files:
-                    filePaths.append(root + os.sep + f)
+            loadFolder(db, path)
+            loadGoldenSet(db)
 
-            taggedPath = "../zoteroExport/taggedPapers.csv"
-            notApplicablePath = "../zoteroExport/notApplicable.csv"
-
-            tagSearchDetail, taggedEntries = parse.parseFile(taggedPath)
-            naSearchDetail, naEntries = parse.parseFile(notApplicablePath)
-
-            taggedEntries = parse.zoteroToIEEE(taggedEntries)
-            naEntries = parse.zoteroToIEEE(naEntries)
-            
-            db.putSearchResults(tagSearchDetail, taggedEntries)
-            db.putSearchResults(naSearchDetail, naEntries)
-
-            for f in filePaths:
-                print("Parsing: " + f)
-                searchDetails, entries = parse.parseFile(f)
-                db.putSearchResults(searchDetails, entries)
 
         else: 
             print("Incorrect arguments. Only 'report' and 'load' are currently supported.")
