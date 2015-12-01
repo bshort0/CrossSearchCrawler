@@ -1,307 +1,11 @@
 
 import sys
 import os
-import csv
-from db import DBManager
-from csv import DictReader
 from os.path import isfile, join
 
-
-
-
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
-
-
-def parseCSVLine(line, headerNames):
-    entry = {}
-    i = 0
-    currentItem = ""
-    openQuoteCount = 0
-    char = ""
-    for count in range(0, len(line)):
-        char = line[count]
-        if i < len(headerNames):
-            if char == ',' and openQuoteCount == 0:
-                entry[headerNames[i]] = currentItem
-                i += 1
-                currentItem = ""
-            elif char == '"' and openQuoteCount == 0:
-                openQuoteCount += 1
-            elif char == '"':
-                openQuoteCount -= 1
-            else:
-                currentItem += char
-        else:
-            break
-
-    # Add on the last item
-    if char != ',' and i < len(headerNames):
-        entry[headerNames[i]] = currentItem
-
-    while i < len(headerNames):
-        entry[headerNames[i]] = ""
-        i += 1
-
-    return entry
-
-def parseFile(filePath):
-    csvFile = open(filePath, mode="r", errors="ignore").read()
-
-    contents = []
-    currentLine = ""
-    for char in csvFile:
-        if is_ascii(char):
-            if char == "\n":
-                contents.append(currentLine)
-                currentLine = ""
-            elif char == '\t':
-                currentLine += ","
-            else:
-                currentLine += char
-        else:
-            pass
-
-    firstLine = contents[0].strip().strip(',')
-    searchDetails = parseCSVLine(firstLine, ['url', 'date', 'query', 'site'])
-
-    headerLine = contents[1]
-    fieldNames = headerLine.replace('"', '').strip().split(',')
-
-    contents = contents[2::]
-    
-    entries = []
-    for line in contents:
-        entry = parseCSVLine(line, fieldNames)
-        if not containsStopWords(entry):
-            entries.append(entry)
-
-    return searchDetails, entries
-
-
-def containsStopWords(entry):
-    stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter', \
-                 'title page', 'program guide', 'program at a glance', 'list of papers', \
-                 'technical program', 'author index', 'tutorial', 'conference program', \
-                 'general session', 'front cover', 'keyword index', "- toc", "book of abstracts"]
-
-    if 'Document Title' in entry:
-        title = entry['Document Title'].lower().strip('[]')
-    elif 'Title' in entry:
-        title = entry['Title'].lower().strip('[]')
-    else:
-        title = ""
-
-    for word in stopWords:
-        if title.startswith(word) or title.endswith(word):
-            return True
-
-    return False
-
-def zoteroToIEEE(zoteroEntries):
-
-    transfers = {"Title" : "Document Title", "Author" : "Authors", "Url" : "PDF Link", "Publication Year" : "Year"}
-    converted = []
-
-    for entry in zoteroEntries:
-        newEntry = {}
-        for k in entry.keys():
-            if k in transfers.keys():
-                newEntry[transfers[k]] = entry[k]
-            elif k == "Pages":
-                if "-" in entry[k]:
-                    newEntry["Start Page"] = entry[k].split("-")[0]
-                    newEntry["End Page"] = entry[k].split("-")[1]
-                else:
-                    newEntry["Start Page"] = ""
-                    newEntry["End Page"] = ""
-            else:
-                newEntry[k] = entry[k]
-        converted.append(newEntry)
-
-    return converted
-
-
-def generateReportCrossover(db):
-    
-    listTable = []
-    searches = db.getSearches()
-
-    firstLine = ['Total', 'Total']
-    for s in searches:
-        firstLine.append(s[1])
-
-    listTable.append(firstLine)
-
-    secondLine = ['Total', '']
-    for s in searches:
-        secondLine.append(str(len(db.getSearchResults(s[0]))))
-
-    listTable.append(secondLine)
-
-    for s in searches:
-        line = [s[1], str(len(db.getSearchResults(s[0])))]
-        for other in searches:
-            line.append(str(len(db.getOverlappingResults(s[0], other[0]))))
-        listTable.append(line)
-
-    return listTable
-
-def generateReportByYear(db):
-    
-    listTable = []
-
-    years = {}
-    searches = db.getSearchesByYear()
-    keys = searches.keys()
-
-    firstLine = ['Year']
-    for s in keys:
-        firstLine.append(s)
-        for y in searches[s].keys():
-            if y not in years:
-                years[y] = []
-            years[y].append(searches[s][y])
-
-    listTable.append(firstLine)
-
-    yearKeys = sorted(years.keys())
-
-    for y in yearKeys:
-        line = []
-        line.append(y)
-        for count in years[y]:
-            line.append(count)
-        listTable.append(line)
-
-    return listTable
-
-
-def generateAuthorReport(db):
-
-    listTable = []
-
-    numAuthors = len(db.getAuthors())
-    searchCounts = db.getSearchesToAuthorCount()
-
-    searches = searchCounts.keys()
-
-    firstLine = ['Search', 'Total']
-    secondLine = ['Num Authors', numAuthors]
-    for s in searches:
-        firstLine.append(s)
-        secondLine.append(searchCounts[s])
-
-    listTable.append(firstLine)
-    listTable.append(secondLine)
-    
-    return listTable
-
-
-def reportToCSV(report):
-
-    content = ""
-    for line in report:
-        for s in line:
-            content += str(s) + ","
-        content += "\n"
-
-    return content
-
-
-def linesToCSV(report):
-
-    content = ""
-    for line in report:
-        content += line + "\n"
-
-    return content
-
-
-def getCSVHeader(filePath):
-    csvFile = open(filePath, mode="r", errors="ignore").read()
-
-    lineCount = 0
-    contents = []
-    currentLine = ""
-    for char in csvFile:
-        if lineCount < 2:
-            if is_ascii(char):
-                if char == "\n":
-                    contents.append(currentLine)
-                    lineCount += 1
-                    currentLine = ""
-                elif char == '\t':
-                    currentLine += ","
-                else:
-                    currentLine += char
-        else:
-            break
-
-    header = contents[0].strip().strip(',') + "\n" + contents[1].replace('"', '').strip().strip(",")
-
-    return header
-
-
-def resultsFileToLists(filePath):
-    csvFile = open(filePath, mode="r", errors="ignore").read()
-
-    contents = []
-    currentLine = ""
-    for char in csvFile:
-        if is_ascii(char):
-            if char == "\n":
-                currentLine = validateCSVLine(currentLine)
-                contents.append(currentLine)
-                currentLine = ""
-            elif char == '\t':
-                currentLine += ","
-            else:
-                currentLine += char
-        else:
-            pass
-
-    # Remove the first two lines which should be the header
-    contents = contents[2::]
-
-    return contents
-
-
-# Removes meaningless quotes to make sure the line matches CSV standard
-def validateCSVLine(line):
-
-    # Replace triple quotes with double quotes
-    line = line.replace('\"\"\"', '\"\"')
-    # Start with the first character
-    newLine = line[0]
-
-    if newLine == '"':
-        quoteCount = 1
-    else:
-        quoteCount = 0
-
-    for i in range(1, (len(line)-1)):
-        char = line[i]
-        lastChar = line[(i-1)]
-        nextChar = line[(i+1)]        
-
-        if char == '"':
-            quoteCount += 1
-            if nextChar == ',' and (quoteCount % 2) == 0:
-                newLine += char
-            elif lastChar == ',' and quoteCount == 1:
-                newLine += char
-        elif char == ',' and (quoteCount % 2) == 0:
-            quoteCount = 0
-            newLine += char
-        else:
-            newLine += char
-
-    if line[(len(line)-1)] == '"' or line[(len(line)-1)] == ',':
-        newLine += line[(len(line)-1)]
-
-    return newLine
-
+from db import DBManager
+import reports
+import parse
     
 def main():
     if len(sys.argv) > 1:
@@ -311,18 +15,18 @@ def main():
         command = sys.argv[1]
 
         if command == "report-crossover":
-            report = generateReportCrossover(db)
-            report = reportToCSV(report)
+            report = reports.generateReportCrossover(db)
+            report = parse.reportToCSV(report)
             print(report)
 
         elif command == "report-by-year":
-            report = generateReportByYear(db)
-            report = reportToCSV(report)
+            report = reports.generateReportByYear(db)
+            report = parse.reportToCSV(report)
             print(report)
 
         elif command == "report-by-authors":
-            report = generateAuthorReport(db)
-            report = reportToCSV(report)
+            report = reports.generateAuthorReport(db)
+            report = parse.reportToCSV(report)
             print(report)
 
         elif command == "compile-folder":
@@ -336,13 +40,13 @@ def main():
                     filePaths.append(root + os.sep + f)
 
             finalEntries = []
-            header = getCSVHeader(filePaths[0])
+            header = parse.getCSVHeader(filePaths[0])
             finalEntries.append(header)
             for f in filePaths:
-                entries = resultsFileToLists(f)
+                entries = parse.resultsFileToLists(f)
                 finalEntries += entries
 
-            contents = linesToCSV(finalEntries)
+            contents = parse.linesToCSV(finalEntries)
 
             outFile = open(outputFile, 'w')
             outFile.write(contents)
@@ -362,11 +66,11 @@ def main():
                     filePaths.append(root + os.sep + f)
 
             for f in filePaths:
-                print("Fixing: " + f)
+                print("Cleaning CSV for: " + f)
                 finalEntries = []
-                header = getCSVHeader(f)
+                header = parse.getCSVHeader(f)
                 finalEntries.append(header)
-                entries = resultsFileToLists(f)
+                entries = parse.resultsFileToLists(f)
                 finalEntries += entries
 
                 contents = ""
@@ -375,8 +79,6 @@ def main():
 
                 with open(f, 'w') as outFile:
                     outFile.write(contents)
-
-
 
         elif command == "load":
 
@@ -390,18 +92,18 @@ def main():
             taggedPath = "../zoteroExport/taggedPapers.csv"
             notApplicablePath = "../zoteroExport/notApplicable.csv"
 
-            tagSearchDetail, taggedEntries = parseFile(taggedPath)
-            naSearchDetail, naEntries = parseFile(notApplicablePath)
+            tagSearchDetail, taggedEntries = parse.parseFile(taggedPath)
+            naSearchDetail, naEntries = parse.parseFile(notApplicablePath)
 
-            taggedEntries = zoteroToIEEE(taggedEntries)
-            naEntries = zoteroToIEEE(naEntries)
+            taggedEntries = parse.zoteroToIEEE(taggedEntries)
+            naEntries = parse.zoteroToIEEE(naEntries)
             
             db.putSearchResults(tagSearchDetail, taggedEntries)
             db.putSearchResults(naSearchDetail, naEntries)
 
             for f in filePaths:
                 print("Parsing: " + f)
-                searchDetails, entries = parseFile(f)
+                searchDetails, entries = parse.parseFile(f)
                 db.putSearchResults(searchDetails, entries)
 
         else: 
