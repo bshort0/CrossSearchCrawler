@@ -1,5 +1,4 @@
 
-
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
 
@@ -168,18 +167,12 @@ def resultsFileToLists(filePath):
     for char in csvFile:
         if is_ascii(char):
             if char == "\n":
-                currentLine = validateCSVLine(currentLine)
                 contents.append(currentLine)
                 currentLine = ""
-            elif char == '\t':
-                currentLine += ","
             else:
                 currentLine += char
         else:
             pass
-
-    # Remove the first two lines which should be the header
-    contents = contents[2::]
 
     return contents
 
@@ -218,6 +211,23 @@ def validateCSVLine(line):
         newLine += line[(len(line)-1)]
 
     return newLine
+
+
+def validateCSVfile(filePath):
+	# Assumes that filePath has been checked to exist
+	print("Cleaning CSV for: " + filePath)
+	finalEntries = []
+	header = getCSVHeader(filePath)
+	finalEntries.append(header)
+	entries = resultsFileToLists(filePath)
+	finalEntries += entries
+
+	contents = ""
+	for entry in finalEntries:
+		entry = validateCSVLine(entry)
+		contents += entry + "\n"
+
+	return contents
 
 
 def main():

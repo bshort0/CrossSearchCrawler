@@ -1,11 +1,20 @@
 
 import sys
 import os
-from os.path import isfile, isfolder, join
+from os.path import isfile, isdir, join
 
 from db import DBManager
 import reports
 import parse
+
+
+def getFilePaths(folderPath):
+    filepaths = []
+    for root, dirs, files in os.walk(folderPath):
+            for f in files:
+                filepaths.append(root + os.sep + f)
+
+    return filepaths
 
 
 def loadGoldenSet(db, taggedPath = "../zoteroExport/taggedPapers.csv", notApplicablePath = "../zoteroExport/notApplicable.csv"):
@@ -30,10 +39,10 @@ def loadGoldenSet(db, taggedPath = "../zoteroExport/taggedPapers.csv", notApplic
 
 def loadFolder(db, folderPath):
 
-    if isfolder(folderPath):
-        for root, dirs, files in os.walk(path):
-            for f in files:
-                loadFile(db, root + os.sep + f)
+    if isdir(folderPath):
+        filepaths = getFilePaths(folderPath)
+        for f in filepaths:
+            loadFile(db, f)
     else:
         pass
 
@@ -76,10 +85,7 @@ def main():
             path = sys.argv[2]
             outputFile = sys.argv[3]
 
-            filePaths = []
-            for root, dirs, files in os.walk(path):
-                for f in files:
-                    filePaths.append(root + os.sep + f)
+            filePaths = getFilePaths(path)
 
             finalEntries = []
             header = parse.getCSVHeader(filePaths[0])
@@ -94,33 +100,29 @@ def main():
             outFile.write(contents)
             outFile.close()
 
-        elif command == "cleanse-CSV":
+        elif command == "validateCSV":
             """
             Goes through each file in the directory given,
             reads each CSV line and validates it, then 
             rewrites to the file.
             """
+
             path = sys.argv[2]
-
-            filePaths = []
-            for root, dirs, files in os.walk(path):
-                for f in files:
-                    filePaths.append(root + os.sep + f)
-
-            for f in filePaths:
-                print("Cleaning CSV for: " + f)
-                finalEntries = []
-                header = parse.getCSVHeader(f)
-                finalEntries.append(header)
-                entries = parse.resultsFileToLists(f)
-                finalEntries += entries
-
-                contents = ""
-                for e in finalEntries:
-                    contents += e + "\n"
-
+            if isfile(path):
+                contents = parse.validateCSVfile(f)
+                
                 with open(f, 'w') as outFile:
                     outFile.write(contents)
+
+            elif isdir(path):
+                filePaths = getFilePaths(path)
+                for f in filePaths:
+                    contents = parse.validateCSVfile(f)
+                    
+                    with open(f, 'w') as outFile:
+                        outFile.write(contents)
+            else:
+                pass
 
         elif command == "load":
 
