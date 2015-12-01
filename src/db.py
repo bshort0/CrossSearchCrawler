@@ -168,27 +168,25 @@ class DBManager:
 		links = self.getSearchPubLinks()
 		pubs = self.getPublications()
 
-		years = set()
+		yearCountSQL = "SELECT count(*) FROM publications INNER JOIN searchpublink ON publications.id=searchpublink.pubID WHERE searchpublink.searchID=%s AND publications.year=%s"
+
+		years = []
+		y = 1990
+		while y < 2016:
+			years.append(str(y))
+			y += 1
+
 		searchesByYear = {}
 		for s in searches:
-			searchesByYear[s[0]] = {}
-			searchID = s[1]
-			pubIDs = []
-			for l in links:
-				if l[0] == searchID:
-					pubIDs.append(l[1])
-			for p in pubs:
-				if p[0] in pubIDs:
-					if p[2] not in searchesByYear[s[0]]:
-						years.add(p[1])
-						searchesByYear[s[0]][p[2]] = 0
-					searchesByYear[s[0]][p[2]] += 1
+			searchID = s[0]
+			searchText = s[1]
+			searchesByYear[searchText] = {}
 
-		for s in searchesByYear.keys():
 			for y in years:
-				if y not in searchesByYear[s]:
-					searchesByYear[s][y] = 0
-
+				sql = yearCountSQL %(searchID, y)
+				self.cursor.execute(sql)
+				count = self.cursor.fetchone()[0]
+				searchesByYear[searchText][y] = count
 
 		return searchesByYear
 
