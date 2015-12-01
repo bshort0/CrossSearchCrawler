@@ -121,6 +121,41 @@ class DBManager:
 		return self.cursor.fetchall()
 
 
+	def getPublications(self):
+		sql = "SELECT id, title, year, doi, startpage, endpage from publications;"
+		self.cursor.execute(sql)
+
+		return self.cursor.fetchall()
+
+
+	def getSearchPubLinks(self):
+		sql = "SELECT searchID, pubID from searchpublink;"
+		self.cursor.execute(sql)
+
+		return self.cursor.fetchall()
+
+
+	def getAuthors(self):
+		sql = "SELECT id, name FROM authors;"
+		self.cursor.execute(sql)
+
+		return self.cursor.fetchall()
+
+
+	def getAuthorPubLinks(self):
+		sql = "SELECT authorID, pubID from authorpublink;"
+		self.cursor.execute(sql)
+
+		return self.cursor.fetchall()
+
+	def getSearchResults(self, searchID):
+		sql = "SELECT pubID from searchpublink where searchID=%s;" % (searchID)
+		self.cursor.execute(sql)
+		results = self.cursor.fetchall()
+
+		return results
+
+
 	"""
 	This function returns a grouping of searches by year.
 
@@ -129,15 +164,9 @@ class DBManager:
 	There is probably a more efficient way to do this in sql but I don't know how to write it.
 	"""
 	def getSearchesByYear(self):
-		searchsql = "SELECT searchText, id from searches;"
-		linksql = "SELECT searchID, pubID from searchpublink;"
-		pubsql = "SELECT id, year from publications;"
-		self.cursor.execute(searchsql)
-		searches = self.cursor.fetchall()
-		self.cursor.execute(linksql)
-		links = self.cursor.fetchall()
-		self.cursor.execute(pubsql)
-		pubs = self.cursor.fetchall()
+		searches = self.getSearches()
+		links = self.getSearchPubLinks()
+		pubs = self.getPublications()
 
 		years = set()
 		searchesByYear = {}
@@ -150,10 +179,10 @@ class DBManager:
 					pubIDs.append(l[1])
 			for p in pubs:
 				if p[0] in pubIDs:
-					if p[1] not in searchesByYear[s[0]]:
+					if p[2] not in searchesByYear[s[0]]:
 						years.add(p[1])
-						searchesByYear[s[0]][p[1]] = 0
-					searchesByYear[s[0]][p[1]] += 1
+						searchesByYear[s[0]][p[2]] = 0
+					searchesByYear[s[0]][p[2]] += 1
 
 		for s in searchesByYear.keys():
 			for y in years:
@@ -164,22 +193,10 @@ class DBManager:
 		return searchesByYear
 
 
-	def getAuthors(self):
-		sql = "SELECT id, name FROM authors;"
-		self.cursor.execute(sql)
-
-		return self.cursor.fetchall()
-
-
 	def getSearchesToAuthorCount(self):
-		authPubSql = "SELECT authorID, pubID FROM authorpublink;"
-		searchPubSql = "SELECT searchID, pubID FROM searchpublink;"
 
-		self.cursor.execute(authPubSql)
-		authLinks = self.cursor.fetchall()
-
-		self.cursor.execute(searchPubSql)
-		searchLinks = self.cursor.fetchall()
+		authLinks = self.getAuthorPubLinks()
+		searchLinks = self.getSearchPubLinks()
 
 		searches = self.getSearches()
 
@@ -196,14 +213,6 @@ class DBManager:
 			searchCounts[key] = len(searchCounts[key])
 
 		return searchCounts
-
-
-	def getSearchResults(self, searchID):
-		sql = "SELECT pubID from searchpublink where searchID=%s;" % (searchID)
-		self.cursor.execute(sql)
-		results = self.cursor.fetchall()
-
-		return results
 
 	"""
 	Returns a list of publication IDs that are mapped to both searchIDs in searchpublink
