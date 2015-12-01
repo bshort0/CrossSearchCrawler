@@ -1,19 +1,38 @@
 
 import sqlite3
 
+"""
+An class for handling all of the operations with the database.
+"""
 class DBManager:
+
+	"""
+	The constructor function of this object.
+
+	When a object of this class is instantiated, a database
+	connection is established and then the sql script is executed
+	to ensure that all of the tables and indexes exist.
+	"""
 	def __init__(self, connection="searches.db"):
 		self.conn = sqlite3.connect(connection)
 		self.cursor = self.conn.cursor()
 
 		self.initializeTables()
 
+
+	"""
+	Executes the sql script to create the tables and indexes.
+	"""
 	def initializeTables(self):
 		
 		commands = open('sql_commands.sql', 'r').read()
 		
 		self.cursor.executescript(commands)
 
+
+	"""
+	Given a search and result entries, enters that data into the database.
+	"""
 	def putSearchResults(self, searchDetails, entries):
 
 		searchID = self.putSearch(searchDetails)
@@ -22,6 +41,9 @@ class DBManager:
 			self.putSearchLink(searchID, entryID)
 
 
+	"""
+	Enters data for a single search into the database.
+	"""
 	def putSearch(self, search):
 		exists = False
 
@@ -44,6 +66,9 @@ class DBManager:
 		return idVal[0]
 
 
+	"""
+	Enters data for a single publication into the database.
+	"""
 	def putEntry(self, entry):
 		exists = False
 
@@ -68,6 +93,9 @@ class DBManager:
 		return idVal[0]
 		
 
+	"""
+	Enters data for a single author into the database.
+	"""
 	def putAuthor(self, authorName):
 		exists = False
 
@@ -89,6 +117,10 @@ class DBManager:
 
 		return idVal[0]
 
+
+	"""
+	Enters the IDs of a search and publication pair.
+	"""
 	def putSearchLink(self, searchID, entryID):
 		exists = False
 		idSql = 'SELECT searchID, pubID FROM searchpublink WHERE searchID="%s" AND pubID="%s";' % (searchID, entryID)
@@ -101,6 +133,10 @@ class DBManager:
 			putSql = 'INSERT INTO searchpublink (searchID, pubID) VALUES ("%s", "%s");' % (searchID, entryID)
 			self.cursor.execute(putSql)
 
+
+	"""
+	Enters the IDs of a author and publication pair.
+	"""
 	def putAuthorPubLink(self, authorID, pubID):
 		exists = False
 		idSql = 'SELECT authorID, pubID FROM authorpublink WHERE authorID="%s" AND pubID="%s";' % (authorID, pubID)
