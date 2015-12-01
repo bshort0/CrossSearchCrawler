@@ -77,8 +77,8 @@ Loads a single file into the database.
 def loadFile(db, filePath):
 
     if isfile(filePath):
-        print("Loading: " + f)
-        searchDetails, entries = parse.parseFile(f)
+        print("Loading: " + filePath)
+        searchDetails, entries = parse.parseFile(filePath)
         db.putSearchResults(searchDetails, entries)
     else:
         pass
@@ -160,7 +160,7 @@ def main():
         elif command == "load":
             # Loads an entire folder of CSV files and the golden set 
             # into the database
-            
+
             path = sys.argv[2]
             loadFolder(db, path)
             loadGoldenSet(db)
