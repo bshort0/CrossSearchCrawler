@@ -1,5 +1,6 @@
 
 import sqlite3
+import os
 
 """
 An class for handling all of the operations with the database.
@@ -14,6 +15,7 @@ class DBManager:
 	to ensure that all of the tables and indexes exist.
 	"""
 	def __init__(self, connection="searches.db"):
+		self.connectionFilePath = connection
 		self.conn = sqlite3.connect(connection)
 		self.cursor = self.conn.cursor()
 
@@ -268,3 +270,12 @@ class DBManager:
 	def shutdown(self):
 		self.conn.commit()
 		self.conn.close()
+
+
+	"""
+	Close the connection to the database and delete the file.
+	"""
+	def destroy(self):
+		self.conn.commit()
+		self.conn.close()
+		os.remove(self.connectionFilePath)

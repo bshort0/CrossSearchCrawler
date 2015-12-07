@@ -29,7 +29,7 @@ def generateReportCrossover(db):
     for s in searches:
         # s[0] is the id of a search in the database
         # s[1] is the text of the search query 
-        line = [s[0], str(len(db.getSearchResults(s[1])))]
+        line = [s[1], str(len(db.getSearchResults(s[0])))]
         for other in searches:
             # The function being called takes two search IDs and gets 
             # the number of overlapping publications

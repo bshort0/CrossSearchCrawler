@@ -87,6 +87,37 @@ def loadFile(db, filePath):
 
 
 """
+Validates CSV files by sending files to parse.validateCSVfile
+
+Parameters: 
+    path: Path to a CSV file or a folder of CSV files
+
+Return:
+    nothing
+"""
+def validateFolderCSV(path):
+
+    # If a file path was given, only cleanse that file
+    if isfile(path):
+        contents = parse.validateCSVfile(f)
+        
+        with open(f, 'w') as outFile:
+            outFile.write(contents)
+
+    # If a directory path was given, traverse all the files
+    elif isdir(path):
+        filePaths = getFilePaths(path)
+        for f in filePaths:
+            contents = parse.validateCSVfile(f)
+            
+            with open(f, 'w') as outFile:
+                outFile.write(contents)
+    else:
+        pass
+
+
+
+"""
 The command-line interface for the program.
 """
 def main():
@@ -96,7 +127,45 @@ def main():
 
         command = sys.argv[1]
 
-        if command == "report-crossover":
+        if command == "do-everything":
+
+            if len(sys.argv) > 2:
+                path = sys.argv[2]
+            else:
+                path = input("Please enter the path to the directory to load: ")
+
+            db.destroy()
+            db = DBManager()
+
+            validate = input("Do you want to validate the CSV files? This takes longer and has probably already been done. (Y/N): ")
+
+            if validate.lower() == 'y' or validate.lower() == "yes":
+                validateCSVfile(path)
+
+            loadFolder(db, path)
+            loadGoldenSet(db)
+
+            print("\nDatabase populated!\n")
+            print("Generating search crossover report. Will be known as 'crossover-report.csv'")
+            report = reports.generateReportCrossover(db)
+            report = parse.reportToCSV(report)
+            with open("crossover-report.csv", "w") as out:
+                out.write(report)
+
+            print("Generating search count by year report. Will be known as 'year-report.csv'")
+            report = reports.generateReportByYear(db)
+            report = parse.reportToCSV(report)
+            with open("year-report.csv", "w") as out:
+                out.write(report)
+
+            print("Generating author count by search report. Will be known as 'author-report.csv'")
+            report = reports.generateAuthorReport(db)
+            report = parse.reportToCSV(report)
+            with open("author-report.csv", "w") as out:
+                out.write(report)
+
+
+        elif command == "report-crossover":
             report = reports.generateReportCrossover(db)
             report = parse.reportToCSV(report)
             print(report)
@@ -139,23 +208,7 @@ def main():
             # traverses through each file and ensures
             # that they each follow valid CSV format
             path = sys.argv[2]
-            if isfile(path):
-                # If a file path was given, only cleanse that file
-                contents = parse.validateCSVfile(f)
-                
-                with open(f, 'w') as outFile:
-                    outFile.write(contents)
-
-            elif isdir(path):
-                # If a directory path was given, traverse all the files
-                filePaths = getFilePaths(path)
-                for f in filePaths:
-                    contents = parse.validateCSVfile(f)
-                    
-                    with open(f, 'w') as outFile:
-                        outFile.write(contents)
-            else:
-                pass
+            validateFolderCSV(path)
 
         elif command == "load":
             # Loads an entire folder of CSV files and the golden set 
