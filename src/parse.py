@@ -1,25 +1,47 @@
 
+
+"""
+Checks if a character is valid ascii. 
+
+This was made to deal with weird characters in the CSV data files.
+"""
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
 
 
+"""
+Parses a single line of CSV text into a dictionary.
+
+Parameters:
+    line: single line of CSV text
+    headerNames: a list of names of headers of the CSV file
+
+Returns:
+    A dictionary with headerNames values as the keys and the text value from the CSV line
+"""
 def parseCSVLine(line, headerNames):
     entry = {}
     i = 0
     currentItem = ""
     openQuoteCount = 0
     char = ""
+    # Parsing character by character
     for count in range(0, len(line)):
         char = line[count]
+        # As long as there are more header names
         if i < len(headerNames):
+            # if it's a comma and it's not escaped, save the item to the dictionary
             if char == ',' and openQuoteCount == 0:
                 entry[headerNames[i]] = currentItem
                 i += 1
                 currentItem = ""
+            # if there were no open quotes and this is a quote, it's an open quote
             elif char == '"' and openQuoteCount == 0:
                 openQuoteCount += 1
+            # else, this quote is a close quote
             elif char == '"':
                 openQuoteCount -= 1
+            # Not a special case. Just save the character to the current string.
             else:
                 currentItem += char
         else:
@@ -29,6 +51,7 @@ def parseCSVLine(line, headerNames):
     if char != ',' and i < len(headerNames):
         entry[headerNames[i]] = currentItem
 
+    # Initialize all of the headerNames into the dictionary with an empty value
     while i < len(headerNames):
         entry[headerNames[i]] = ""
         i += 1
@@ -36,9 +59,20 @@ def parseCSVLine(line, headerNames):
     return entry
 
 
+"""
+This function parses an entire CSV data file.
+
+Parameters:
+    filePath: the path to the file in which to parse
+
+Returns:
+    searchDetails: A dictionary with details about the search. Specifically the search site and the search text
+    entries: A list of dictionaries of each csv line in the file
+"""
 def parseFile(filePath):
     csvFile = open(filePath, mode="r", errors="ignore").read()
 
+    # Get the contents of the file and ensure every character is valid ascii
     contents = []
     currentLine = ""
     for char in csvFile:
@@ -54,6 +88,7 @@ def parseFile(filePath):
             pass
 
     firstLine = contents[0].strip().strip(',')
+    # Get the search details from the first line
     searchDetails = parseCSVLine(firstLine, ['url', 'date', 'query', 'site'])
 
     headerLine = contents[1]
@@ -61,6 +96,7 @@ def parseFile(filePath):
 
     contents = contents[2::]
     
+    # iterate and parse each line with parseCSV Line
     entries = []
     for line in contents:
         entry = parseCSVLine(line, fieldNames)
@@ -70,6 +106,13 @@ def parseFile(filePath):
     return searchDetails, entries
 
 
+"""
+Checks if any publication titles contain stopwords. Stopwords are words that make it blatantly obvious
+that the paper is not applicable to this study.
+
+Parameters:
+    entry: a parsed CSV line as a dictionary. Like one returned from parseCSVLine
+"""
 def containsStopWords(entry):
     stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter', \
                  'title page', 'program guide', 'program at a glance', 'list of papers', \
@@ -90,17 +133,26 @@ def containsStopWords(entry):
     return False
 
 
+"""
+Converts entries generated from Zotero exported files to be able to work with IEEE exported files.
+It does this by adding IEEE header names to the entry dictionaries with the same value as the 
+corresponding Zotero header.
+"""
 def zoteroToIEEE(zoteroEntries):
 
+    # Dictionary of key, values where the keys are zotero headers and values are IEEE equivalent headers
     transfers = {"Title" : "Document Title", "Author" : "Authors", "Url" : "PDF Link", "Publication Year" : "Year"}
     converted = []
 
     for entry in zoteroEntries:
         newEntry = {}
         for k in entry.keys():
+            # If k needs to be converted
             if k in transfers.keys():
+                # Add k's value to the dictionary with entry[k]'s value
                 newEntry[transfers[k]] = entry[k]
             elif k == "Pages":
+                # Parsing the start pages
                 if "-" in entry[k]:
                     newEntry["Start Page"] = entry[k].split("-")[0]
                     newEntry["End Page"] = entry[k].split("-")[1]
@@ -114,6 +166,17 @@ def zoteroToIEEE(zoteroEntries):
     return converted
 
 
+"""
+Converts a list of lists into a CSV file.
+
+Parameters:
+    report: a list of lists
+
+Returns:
+    content: a single string that in CSV format generated from report. 
+            Each top level list became a line and the sub lists' contents 
+            were separated by commas.
+"""
 def reportToCSV(report):
 
     content = ""
@@ -125,6 +188,15 @@ def reportToCSV(report):
     return content
 
 
+"""
+Converts a list of lines to a single string
+
+Parameters: 
+    report: a list of lines of text
+
+Returns:
+    content: a single string of concatenated lines with a newline character in between each one
+"""
 def linesToCSV(report):
 
     content = ""
@@ -134,6 +206,15 @@ def linesToCSV(report):
     return content
 
 
+"""
+Gets the first two lines of a file and returns them as a single string.
+
+Parameters:
+    filePath: the page to the CSV file
+
+Returns:
+    header: A string for a header to an IEEE CSV citation data file
+"""
 def getCSVHeader(filePath):
     csvFile = open(filePath, mode="r", errors="ignore").read()
 
@@ -141,6 +222,7 @@ def getCSVHeader(filePath):
     contents = []
     currentLine = ""
     for char in csvFile:
+        # Only parse the first two lines because that's where the header is
         if lineCount < 2:
             if is_ascii(char):
                 if char == "\n":
@@ -159,6 +241,16 @@ def getCSVHeader(filePath):
     return header
 
 
+"""
+Extracts each data entry line from a CSV data file
+
+Parameters:
+    filePath: the path to a CSV data file
+
+Returns:
+    contents: a list of CSV lines
+
+"""
 def resultsFileToLists(filePath):
     csvFile = open(filePath, mode="r", errors="ignore").read()
 
@@ -177,7 +269,17 @@ def resultsFileToLists(filePath):
     return contents
 
 
-# Removes meaningless quotes to make sure the line matches CSV standard
+"""
+Removes unecessary double quote (") characters from CSV lines.
+IEEE exports some files with double quotes escaping commas in value fields,
+but does so poorly and it invalidates CSV.
+
+Parameters:
+    line: the CSV line
+
+Returns:
+    newLine: the fixed CSV line
+"""
 def validateCSVLine(line):
 
     # Replace triple quotes with double quotes
@@ -213,6 +315,16 @@ def validateCSVLine(line):
     return newLine
 
 
+"""
+Removes bad quotes from an entire CSV data file.
+
+Parameters:
+    filePath: the path to a CSV data file
+
+Returns:
+    contents: A string that is the cleansed contents of the CSV file
+
+"""
 def validateCSVfile(filePath):
 	# Assumes that filePath has been checked to exist
 	print("Cleaning CSV for: " + filePath)
@@ -230,6 +342,16 @@ def validateCSVfile(filePath):
 	return contents
 
 
+"""
+Compiles a folder of CSV files that were downloaded page by page from IEEE.
+This happens when a search returns more than 200 results, they must be downloaded page by page.
+
+Parameters:
+    filePaths: a list of filePaths for each file to be compiled into one
+
+Returns:
+    contents: a string of all of the data from all the files. Can be written to a file or parsed.
+"""
 def compileFolder(filePaths):
 
 	finalEntries = []
@@ -237,6 +359,7 @@ def compileFolder(filePaths):
 	header = parse.getCSVHeader(filePaths[0])
 	finalEntries.append(header)
 	for f in filePaths:
+        # Results file to lists leaves out the file headers and just gets the entries
 		entries = parse.resultsFileToLists(f)
 		finalEntries += entries
 
@@ -246,7 +369,7 @@ def compileFolder(filePaths):
 
 
 def main():
-	pass
+	print("Sorry, this file doesn't have anything to run.")
 	
 if __name__ == "__main__":
 	main()
