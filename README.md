@@ -5,9 +5,9 @@ CrossSearchCrawler began as a web crawler for IEEE xplore and ACM digital librar
 # Usage
 Starting from scratch? Build the entire database and generate all reports by executing this command from the src folder of this project:
 
-'''shell
+```shell
 	python main.py do-everything ../searchesFrom_1998
-'''
+```
 
 Of course, substitute the python call with the call to run python files on your machine. 
 
@@ -17,30 +17,30 @@ searchesFrom_1998 is a folder that contains data files downloaded from IEEE xplo
 Other commands that are available are:
 
 
-'''shell
+```shell
 	python main.py report-crossover
-'''
+```
 
 This command does not load any files. It simply generates a crossover report of all the data currently populated in the database.
 
 
-'''shell
+```shell
 	python main.py report-by-year
-'''
+```
 
 This command does not load any files. It simply generates a report showing how many results there were for each search query compared to years.
 
 
-'''shell
+```shell
 	python main.py report-by-authors
-'''
+```
 
 This command does not load any files. It simply generates a report showing the count of contributing authors for each search query.
 
 
-'''shell
+```shell
 	python main.py compile-folder /path/to/folder/ /output/file/name/
-'''
+```
 
 This command is used to compile a folder of small CSV files into a single larger CSV file. This was created in order to compile search results from multiple files that were produced from the same search. This is needed when a single search returns more than 2,000 results, and results must be downloaded page by page.
 
