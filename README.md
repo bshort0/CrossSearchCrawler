@@ -21,21 +21,21 @@ Other commands that are available are:
 	python main.py report-crossover
 ```
 
-This command does not load any files. It simply generates a crossover report of all the data currently populated in the database.
+report-crossover does not load any files. It simply generates a crossover report of all the data currently populated in the database.
 
 
 ```shell
 	python main.py report-by-year
 ```
 
-This command does not load any files. It simply generates a report showing how many results there were for each search query compared to years.
+report-by-year does not load any files. It simply generates a report showing how many results there were for each search query compared to years.
 
 
 ```shell
 	python main.py report-by-authors
 ```
 
-This command does not load any files. It simply generates a report showing the count of contributing authors for each search query.
+report-by-authors does not load any files. It simply generates a report showing the count of contributing authors for each search query.
 
 
 ```shell
@@ -49,14 +49,14 @@ This command is used to compile a folder of small CSV files into a single larger
 	python main.py validate-csv /path/to/folder/
 ```
 
-This command validates csv files within the folder that give to it. This is needed because IEEE xplore escapes commas with double quote characters. Sometimes the way the escaping is done breaks valid CSV. Thus, raw data downloaded from IEEE xplore must be validated to ensure that it will work with this script.
+validate-csv validates csv files within the folder that give to it. This is needed because IEEE xplore escapes commas with double quote characters. Sometimes the way the escaping is done breaks valid CSV. Thus, raw data downloaded from IEEE xplore must be validated to ensure that it will work with this script.
 
 
 ```shell
 	python main.py load /path/to/folder/
 ```
 
-This command loads data from files in the input folder and puts those entries into the database. It is assumed that the only files in the folder are validated (using validate-csv) CSV files downloaded from IEEE xplore.
+load loads data from files in the input folder and puts those entries into the database. It is assumed that the only files in the folder are validated (using validate-csv) CSV files downloaded from IEEE xplore.
 
 
 
