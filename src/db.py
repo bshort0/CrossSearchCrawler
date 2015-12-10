@@ -194,6 +194,14 @@ class DBManager:
 		return results
 
 
+	def getPubById(self, pubID):
+		sql = "SELECT id, title, year, doi from publications where id=%s" % (pubID)
+		self.cursor.execute(sql)
+		result = self.cursor.fetchall()[0]
+
+		return result
+
+
 	"""
 	This function returns a grouping of searches by year.
 
@@ -265,6 +273,30 @@ class DBManager:
 				results.append(r)
 
 		return results
+
+
+	"""
+	Gets the count of publications that overlap for the given list of searchIDs
+
+	Parameters:
+		self: this DBManager
+		searchIDs: a list of search IDs to get the overlap of
+
+	Returns:
+		results: a list of publication entries that were linked to all IDs in searchIDs
+	"""
+	def getOverlapIDs(self, searchIDs):
+
+		if len(searchIDs) > 0:
+			sql = "select pubID from searchpublink where searchID=%s " % (searchIDs[0])
+			for i in range(1, len(searchIDs)):
+				sql += "intersect select pubID from searchpublink where searchID=%s " % (searchIDs[i])
+			sql += ";"
+			self.cursor.execute(sql)
+
+			return self.cursor.fetchall()
+
+		return []
 
 
 	def shutdown(self):

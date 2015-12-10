@@ -1,13 +1,40 @@
+from db import DBManager
+
+def parseCountCommand(db, command):
+	
+	# split on whitespace and remove first value which should be "overlap"
+	args = command.split()[1::]
+	searchIDs = []
+	for a in args:
+		if a.isdigit():
+			searchIDs.append(a)
+
+	result = db.getOverlapIDs(searchIDs)
+	print(len(result))
+
 
 
 def parseOverlapCommand(db, command):
-	pass
 
+	# split on whitespace and remove first command
+	args = command.split()[1::]
+	outputFile = args[0]
+	args = args[1::]
+	searchIDs = []
+	for a in args:
+		if a.isdigit():
+			searchIDs.append(a)
 
+	print("Writing results to: " + outputFile)
 
-def parseCountCommand(db, command):
-	pass
+	results = db.getOverlapIDs(searchIDs)
 
+	content = "Publication ID, Title, Year, DOI\n"
+	for r in results:
+		content += str(db.getPubById(r[0])) + "\n"
+
+	with open(outputFile, 'w') as out:
+		out.write(content)
 
 
 def help():
@@ -17,15 +44,15 @@ def help():
 
 def run(db):
 
-	print("Entering shell. See documentation or type 'help' for available commands.\nType \"quit\" or \"exit\" to leave.)
+	print("Entering shell. See documentation or type 'help' for available commands.\nType \"quit\" or \"exit\" to leave.")
 	command = input(">")
-	while command.lower() != "quit" and command.lower() != "exit":
+	while command.lower() != "quit" and command.lower() != "exit" and command.lower() != 'q':
 
-		if command.startswith("overlap"):
-			parseOverlapCommand(db, command)
-
-		elif command.startswith("count"):
+		if command.lower().startswith("count"):
 			parseCountCommand(db, command)
+
+		elif command.lower().startswith("print-overlap"):
+			parseOverlapCommand(db, command)
 
 		elif command.startswith("help"):
 			help()
