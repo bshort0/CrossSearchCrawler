@@ -37,7 +37,9 @@ def run(db):
 
 
 def main():
-	pass
+	db = DBManager()
+
+	run(db)
 
 	
 if __name__ == "__main__":
