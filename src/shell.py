@@ -62,7 +62,23 @@ def printSearchIDs(db, command):
 
 
 def help():
-	print("Help")
+	print("None of the commands in the shell are case-sensitive. Use whatever you want.\n\n" + \
+		  "To get out of the shell, you can use 'q', 'quit',  or 'exit'. Any of those will work.\n\n" + \
+		  "To get the overlap of any number of searches, use 'count': \n\n" + \
+		  "\t>count ID1 ID2 ... IDn\n\n" + \
+		  "This command will get the number of publications that were returned for any combination of searches. The search ids in this command are separated by whitespace.\n\n" + \
+		  "To get a list of the search query's IDs, just type 'search-ids' or 'ids'.\n" + \
+		  "\t>search-ids\n\n" + \
+		  "This will return a list of all of the ids mapped to their search query for all the saved searches in the database.\n\n" + \
+		  "Don't want to have to print that every time to look up an id? Keep it handy by saving it to a file with 'save-searchids' or 'save-ids':\n" + \
+		  "\t>save-ids /path/to/file\n\n" + \
+		  "This command will take that same list printed by 'search-ids' and save it to a file for you to keep open for reference.\n\n" + \
+		  "Want to see actual publication information from overlap queries instead of just the count? You're in luck! Use 'save-count'\n" + \
+		  "\t>save-count /path/to/file ID1 ID2 ... IDn\n\n" + \
+		  "This will find the overlap between any number of search IDs and print the publications id, title, year, and doi to the output file that you gave the path of.\n\n" + \
+		  "Confused while in the shell? Type 'help' to get this same explanation right here!\n" + \
+		  "\t>help\n\n"
+		 )
 
 
 
