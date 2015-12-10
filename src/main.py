@@ -6,6 +6,7 @@ from os.path import isfile, isdir, join
 from db import DBManager
 import reports
 import parse
+import shell
 
 """
 Utility function to get file paths for every
@@ -182,26 +183,29 @@ def main():
 
         elif command == "compile-folder":
 
-            path = sys.argv[2]
-            outputFile = sys.argv[3]
+            if len(sys.argv) > 2:
+                path = sys.argv[2]
+            else:
+                path = input("Please enter the path to the folder to compile: ")
+
+            while not isdir(path):
+                path = input("Error: The input path must be a directory.\nPlease enter another path: ")
+
+            if len(sys.argv) > 3:
+                outputFile = sys.argv[3]
+            else:
+                outputFile = input("Please enter the name of the output file: ")
 
             filePaths = []
-            if isdir(path):
-                filePaths = getFilePaths(path)
-            else:
-                pass
-                # throw error or something
+            filePaths = getFilePaths(path)
 
-            contents = ""
             if len(filePaths) > 0:
                 contents = parse.compileFolder(filePaths)
+                outFile = open(outputFile, 'w')
+                outFile.write(contents)
+                outFile.close()
             else:
-                pass
-                # throw error or something
-
-            outFile = open(outputFile, 'w')
-            outFile.write(contents)
-            outFile.close()
+                print("The directory you entered was empty. So nothing happened.")
 
         elif command == "validateCSV":
             # For a given directory path,
@@ -218,14 +222,18 @@ def main():
             loadFolder(db, path)
             loadGoldenSet(db)
 
+        elif command == "shell":
+
+            # Run the shell
+            shell.run(db)
 
         else: 
-            print("Incorrect arguments. Only 'report' and 'load' are currently supported.")
+            print("Unsupported command. Please see README for supported operations.")
         
         db.shutdown()
         
     else:
-        print("Incorrect arguments.")
+        print("No commands entered. Please see README for supported operations.")
 
 
 if __name__ == "__main__":

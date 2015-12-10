@@ -1,5 +1,8 @@
 
 
+def run(db):
+	pass
+
 def main():
 	pass
 
