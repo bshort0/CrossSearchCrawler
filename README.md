@@ -58,6 +58,62 @@ validate-csv validates csv files within the folder that give to it. This is need
 
 load loads data from files in the input folder and puts those entries into the database. It is assumed that the only files in the folder are validated (using validate-csv) CSV files downloaded from IEEE xplore.
 
+# Shell Commands
+The shell can be used for doing queries on the fly and for comparing the overlap between any number of searches. Searches are done by the database id. To start the shell, from the src directory, run:
+
+```shell
+python main.py shell
+```
+or
+```shell
+python shell.py
+```
+Both commands will take you to the same place. None of the shell commands are case sensitive. Once you're in the shell, here's what you can do:
+
+To get out of the shell, you can use 'q', 'quit',  or 'exit'.
+```shell 
+>q
+>Q
+>quit
+>Quit
+>exit
+>Exit
+```
+Any of those will work.
+
+To get the overlap of any number of searches, use 'count':
+```shell 
+>count ID1 ID2 ... IDn
+```
+This command will get the number of publications that were returned for any combination of searches. The search ids in this command are separated by whitespace.
+
+To get a list of the search query's IDs, just type 'search-ids' or 'ids'.
+```shell 
+>search-ids
+```
+This will return a list of all of the ids mapped to their search query for all the saved searches in the database.
+
+Don't want to have to print that every time to look up an id? Keep it handy by saving it to a file with 'save-searchids' or 'save-ids':
+```shell 
+>save-ids /path/to/file
+```
+This command will take that same list printed by 'search-ids' and save it to a file for you to keep open for reference.
+
+Want to see actual publication information from overlap queries instead of just the count? You're in luck! Use 'save-count'
+```shell 
+>save-count /path/to/file ID1 ID2 ... IDn
+```
+This will find the overlap between any number of search IDs and print the publications id, title, year, and doi to the output file that you gave the path of.
+
+Confused while in the shell? Type 'help' to get this same explanation right there!
+```shell 
+>help
+```
+
+That's pretty much it for now. This will get expanded as more features are added.
+
+
+
 
 
 
