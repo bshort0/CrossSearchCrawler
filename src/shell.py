@@ -1,5 +1,9 @@
 from db import DBManager
 
+
+"""
+Called from the shell. Returns the count of publications returned for all of the given search IDs.
+"""
 def parseCountCommand(db, command):
 	
 	# split on whitespace and remove first value which should be "overlap"
@@ -13,7 +17,9 @@ def parseCountCommand(db, command):
 	print(len(result))
 
 
-
+"""
+Called from the shell. Prints publication info for the overlapping publications for the searchIDs to an output file.
+"""
 def parseSaveCountCommand(db, command):
 
 	# split on whitespace and remove first command
@@ -37,6 +43,9 @@ def parseSaveCountCommand(db, command):
 		out.write(content)
 
 
+"""
+Called from the shell. Prints the search ids and their search text to the shell.
+"""
 def printSearchIDs(db):
 	searches = db.getSearches()
 
@@ -44,6 +53,14 @@ def printSearchIDs(db):
 		print(str(s[0]) + "|" + str(s[1]))
 
 
+"""
+Called from the shell. Saves the list of searches and IDs to a file.
+
+Parameters:
+	db: instance of DBManager
+	command: the command entered into the shell. The first half is just the string that got this function called.
+			The file path to print should be the second part of this string.
+"""
 def printSearchIDs(db, command):
 	searches = db.getSearches()
 	path = command.split()
@@ -60,7 +77,9 @@ def printSearchIDs(db, command):
 		print("Please enter a filename to save to with \"" + command + "\"")
 	
 
-
+"""
+Called from the shell. Prints out directions for using the shell.
+"""
 def help():
 	print("None of the commands in the shell are case-sensitive. Use whatever you want.\n\n" + \
 		  "To get out of the shell, you can use 'q', 'quit',  or 'exit'. Any of those will work.\n\n" + \
@@ -81,7 +100,15 @@ def help():
 		 )
 
 
+"""
+The main shell of the shell. Entry point for all of the commands. 
 
+Parameters:
+	db: A DBManager object
+
+Returns:
+	Nothing
+"""
 def run(db):
 
 	print("Entering shell. See documentation or type 'help' for available commands.\nType \"quit\" or \"exit\" to leave.")
@@ -108,7 +135,11 @@ def run(db):
 		command = input(">")
 
 
+"""
+Entry point of this file.
 
+Just connects to the database and calls run
+"""
 def main():
 	db = DBManager()
 
