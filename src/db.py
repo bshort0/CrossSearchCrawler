@@ -153,7 +153,7 @@ class DBManager:
 
 
 	def getSearches(self):
-		sql = "SELECT id, searchText from searches;"
+		sql = "SELECT id, searchText from searches order by id ASC;"
 		self.cursor.execute(sql)
 
 		return self.cursor.fetchall()

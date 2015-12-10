@@ -14,7 +14,7 @@ def parseCountCommand(db, command):
 
 
 
-def parseOverlapCommand(db, command):
+def parseSaveCountCommand(db, command):
 
 	# split on whitespace and remove first command
 	args = command.split()[1::]
@@ -37,6 +37,30 @@ def parseOverlapCommand(db, command):
 		out.write(content)
 
 
+def printSearchIDs(db):
+	searches = db.getSearches()
+
+	for s in searches:
+		print(str(s[0]) + "|" + str(s[1]))
+
+
+def printSearchIDs(db, command):
+	searches = db.getSearches()
+	path = command.split()
+	if len(path) > 1:
+		path = path[1]
+		content = "search ID | search Query text\n"
+		for s in searches:
+			content += str(s[0]) + "|" + str(s[1]) + "\n"
+
+		with open(path, 'w') as out:
+			out.write(content)
+
+	else:
+		print("Please enter a filename to save to with \"" + command + "\"")
+	
+
+
 def help():
 	print("Help")
 
@@ -51,8 +75,14 @@ def run(db):
 		if command.lower().startswith("count"):
 			parseCountCommand(db, command)
 
-		elif command.lower().startswith("print-overlap"):
-			parseOverlapCommand(db, command)
+		elif command.lower().startswith("save-count"):
+			parseSaveCountCommand(db, command)
+
+		elif command.lower().startswith("searchids") or command.lower().startswith("ids"):
+			printSearchIDs(db)
+
+		elif command.lower().startswith("save-searchids") or command.lower().startswith("save-ids"):
+			printSearchIDs(db, command)
 
 		elif command.startswith("help"):
 			help()
