@@ -74,7 +74,11 @@ def printSearchIDs(db, command):
 			out.write(content)
 
 	else:
-		print("Please enter a filename to save to with \"" + command + "\"")
+		content = "search ID | search Query text\n"
+		for s in searches:
+			content += str(s[0]) + "|" + str(s[1]) + "\n"
+		print(content)
+		#print("Please enter a filename to save to with \"" + command + "\"")
 	
 
 """
@@ -122,7 +126,7 @@ def run(db):
 			parseSaveCountCommand(db, command)
 
 		elif command.lower().startswith("searchids") or command.lower().startswith("ids"):
-			printSearchIDs(db)
+			printSearchIDs(db, command) #appears to need more than just ids
 
 		elif command.lower().startswith("save-searchids") or command.lower().startswith("save-ids"):
 			printSearchIDs(db, command)

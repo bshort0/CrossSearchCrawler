@@ -100,9 +100,9 @@ def validateFolderCSV(path):
 
     # If a file path was given, only cleanse that file
     if isfile(path):
-        contents = parse.validateCSVfile(f)
+        contents = parse.validateCSVfile(path)
         
-        with open(f, 'w') as outFile:
+        with open(path, 'w') as outFile:
             outFile.write(contents)
 
     # If a directory path was given, traverse all the files
@@ -141,7 +141,7 @@ def main():
             validate = input("Do you want to validate the CSV files? This takes longer and has probably already been done. (Y/N): ")
 
             if validate.lower() == 'y' or validate.lower() == "yes":
-                validateCSVfile(path)
+                validateFolderCSV(path)
 
             loadFolder(db, path)
             loadGoldenSet(db)

@@ -6,10 +6,10 @@ CrossSearchCrawler began as a web crawler for IEEE xplore and ACM digital librar
 Starting from scratch? Build the entire database and generate all reports by executing this command from the src folder of this project:
 
 ```shell
-	python main.py do-everything ../searchesFrom_1998
+	python main.py do-everything ../searchesFrom_1998/(csv file here)
 ```
 
-Of course, substitute the python call with the call to run python files on your machine. 
+Of course, substitute the python call with the call to run python files on your machine. Python 3 is required.
 
 ./searchesFrom_1998 is a folder that contains data files downloaded from IEEE xplore. You can of course use any CSV files downloaded from there as your source. More on that later.
 
