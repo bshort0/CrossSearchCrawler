@@ -12,7 +12,7 @@ def generateReportCrossover(db):
     searches = db.getSearches()
 
     # Setting up the first CSV line in the report
-    firstLine = ['Total', 'Total']
+    firstLine = ['Total', 'Total'] #Should be search name, total?
     for s in searches:
         firstLine.append(s[1])
 
