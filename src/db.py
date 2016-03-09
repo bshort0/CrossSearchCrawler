@@ -279,14 +279,19 @@ class DBManager:
 	"""
 	def getOverlappingYearlyResults(self, searchID1, searchID2, year):
 		overlap = self.getOverlappingResults(searchID1, searchID2)
+		total1 = self.getSearchResults(searchID1)
+		firstResults = []
+		for pubID in total1: #gets total publications for searchID1. Probably not efficient
+			sql = "SELECT year from publications where id=%s;" % (pubID)
+			self.cursor.execute(sql)
+			firstResults += self.cursor.fetchall()
 		results = []
-
 		for pubID in overlap:
 			sql = "SELECT year from publications where id=%s;" % (pubID)
 			self.cursor.execute(sql)
 			results += self.cursor.fetchall()
 		yearFormat = ((str(year)),)
-		return results.count(yearFormat)
+		return [results.count(yearFormat), firstResults.count(yearFormat)]
 
 	"""
 	Gets the count of publications that overlap for the given list of searchIDs
