@@ -42,6 +42,19 @@ def parseSaveCountCommand(db, command):
 	with open(outputFile, 'w') as out:
 		out.write(content)
 
+"""
+Called from the shell. Prints the search ids and their overlap for each year.
+"""
+def printYearlyOverlap(db, command):
+	searches = db.getSearches()
+	searchA = int(command[0])
+	searchB = int(command[1])
+	print("Overlap between '" + searches[searchA - 1][1] + "' and '" + searches[searchB - 1][1] + "'")
+	print("year | overlap")
+	for year in range (1998, 2016):		#can go back to 1990, but IDS not found before 98 anyway!
+		count = db.getOverlappingYearlyResults(searchA, searchB, year)
+		print(str(year) + " | " + str(count))
+
 
 """
 Called from the shell. Prints the search ids and their search text to the shell.
@@ -130,6 +143,10 @@ def run(db):
 
 		elif command.lower().startswith("save-searchids") or command.lower().startswith("save-ids"):
 			printSearchIDs(db, command)
+
+		elif command.startswith("print-annual"):
+			if len(command.split()) == 3:
+				printYearlyOverlap(db, command.split()[1:])
 
 		elif command.startswith("help"):
 			help()

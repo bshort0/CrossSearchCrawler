@@ -105,6 +105,12 @@ Want to see actual publication information from overlap queries instead of just 
 ```
 This will find the overlap between any number of search IDs and print the publications id, title, year, and doi to the output file that you gave the path of.
 
+Want to see how many publications 2 queries have in common per year?
+```shell 
+>print-annual ID1 ID2
+```
+This will print the search text of queries ID1 and ID2, then show how many publications the two have in common each year.
+
 Confused while in the shell? Type 'help' to get this same explanation right there!
 ```shell 
 >help

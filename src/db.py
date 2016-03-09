@@ -274,6 +274,19 @@ class DBManager:
 
 		return results
 
+	"""
+	Returns a list of publication IDs that are mapped to both given searchIDs in searchpublink for a given year
+	"""
+	def getOverlappingYearlyResults(self, searchID1, searchID2, year):
+		overlap = self.getOverlappingResults(searchID1, searchID2)
+		results = []
+
+		for pubID in overlap:
+			sql = "SELECT year from publications where id=%s;" % (pubID)
+			self.cursor.execute(sql)
+			results += self.cursor.fetchall()
+		yearFormat = ((str(year)),)
+		return results.count(yearFormat)
 
 	"""
 	Gets the count of publications that overlap for the given list of searchIDs
