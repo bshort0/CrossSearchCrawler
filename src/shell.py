@@ -57,13 +57,13 @@ def printYearlyOverlap(db, command):
     searchA = int(command[0])
     searchB = int(command[1])
     print("Overlap between '" + searches[searchA - 1][1] + "' and '" + searches[searchB - 1][1] + "'")
-    print("year | overlap | percentage of first search")
+    print("year | overlap | first results | second results | percentage overlapping")
     for year in range(1998, 2016):  # can go back to 1990, but IDS not found before 98 anyway!
-        count, firstTotal = db.getOverlappingYearlyResults(searchA, searchB, year)
+        count, firstTotal, secondTotal = db.getOverlappingYearlyResults(searchA, searchB, year)
         percentage = "-"
-        if firstTotal > 0 :
-            percentage = str(round(((count / firstTotal) * 100), 2))
-        print(str(year) + " | " + str(count) + " | " + percentage + " %")
+        if firstTotal + secondTotal > 0 :
+            percentage = str(round(((count / (firstTotal + secondTotal)) * 100), 2))
+        print(str(year) + " | " + str(count) + " | " + str(firstTotal) + " | " + str(secondTotal) + " | " + percentage + " %")
 
 
 """
@@ -134,9 +134,12 @@ def help():
           "Want to see actual publication information from overlap queries instead of just the count? You're in luck! Use 'save-count'\n" + \
           "\t>save-count /path/to/file ID1 ID2 ... IDn\n\n" + \
           "This will find the overlap between any number of search IDs and print the publications id, title, year, and doi to the output file that you gave the path of.\n\n" + \
-          "Want to see how many publications 2 queries have in common per year? Use 'print-annual'\n" + \
+          "Want to see how many publications 2 queries have in common per year? Use 'print-annual' or 'pa'\n" + \
           "\t>print-annual ID1 ID2\n\n" + \
           "This will print the search text of queries ID1 and ID2, then show how many publications the two have in common each year.\n\n" + \
+          "Want to see how many publications up to 3 categories have in common? Use 'print-categories' or 'pc'\n" + \
+          "\t>print-categories CATEGORY1 CATEGORY2 CATEGORY3\n\n" + \
+          "This will print the number of overlapping results for 3 search categories that are defined in the categories dict.\n\n" + \
           "Confused while in the shell? Type 'help' to get this same explanation right here!\n" + \
           "\t>help\n\n"
           )
