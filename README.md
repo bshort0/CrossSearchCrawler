@@ -111,7 +111,7 @@ Want to see how many publications 2 queries have in common per year?
 ```
 This will print the search text of queries ID1 and ID2, then show how many publications the two have in common each year.
 
-Want to see how many publications up to 3 categories have in common? Use 'print-categories' or 'pc'\n" + \
+Want to see how many publications up to 3 categories have in common? Use 'print-categories' or 'pc'
 ```shell
 print-categories CATEGORY1 CATEGORY2 CATEGORY3
 ```
