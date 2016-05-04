@@ -1,9 +1,14 @@
 from db import DBManager
+categories = {
+    'effectiveness': [37, 31, 39, 35, 38, 30, 32, 36, 34, 33],
+    'performance': [24, 25, 27, 26, 29, 41, 45, 28, 42, 43, 46, 44, 47, 48, 49, 59, 52, 53, 54, 55],
+    'dfas': [19, 20, 21, 22, 23],
+    'null': []
+}
 
 """
 Called from the shell. Returns the count of publications returned for all of the given search IDs.
 """
-
 
 def parseCountCommand(db, command):
     # split on whitespace and remove first value which should be "overlap"
@@ -20,7 +25,6 @@ def parseCountCommand(db, command):
 """
 Called from the shell. Prints publication info for the overlapping publications for the searchIDs to an output file.
 """
-
 
 def parseSaveCountCommand(db, command):
     # split on whitespace and remove first command
@@ -48,7 +52,6 @@ def parseSaveCountCommand(db, command):
 Called from the shell. Prints the search ids and their overlap for each year.
 """
 
-
 def printYearlyOverlap(db, command):
     searches = db.getSearches()
     searchA = int(command[0])
@@ -60,13 +63,12 @@ def printYearlyOverlap(db, command):
         percentage = "-"
         if firstTotal > 0 :
             percentage = str(round(((count / firstTotal) * 100), 2))
-        print(str(year) + " | " + str(count) + " | " + percentage)
+        print(str(year) + " | " + str(count) + " | " + percentage + " %")
 
 
 """
 Called from the shell. Prints the search ids and their search text to the shell.
 """
-
 
 def printSearchIDs(db):
     searches = db.getSearches()
@@ -83,7 +85,6 @@ Parameters:
     command: the command entered into the shell. The first half is just the string that got this function called.
             The file path to print should be the second part of this string.
 """
-
 
 def printSearchIDs(db, command):
     searches = db.getSearches()
@@ -104,11 +105,19 @@ def printSearchIDs(db, command):
             content += str(s[0]) + "|" + str(s[1]) + "\n"
         print(content)
 
+def printCategories(db, command):
+    if len(command) != 3:
+        print("Please include 3 categories!")
+        return
+    for category in command:
+        if category not in categories:
+            print("Invalid category name! Categories are: " + str(categories.keys()))
+            return
+    db.getCategoryOverlap(categories[command[0]], categories[command[1]], categories[command[2]])
 
 """
 Called from the shell. Prints out directions for using the shell.
 """
-
 
 def help():
     print("None of the commands in the shell are case-sensitive. Use whatever you want.\n\n" + \
@@ -143,7 +152,6 @@ Returns:
 	Nothing
 """
 
-
 def run(db):
     print(
         "Entering shell. See documentation or type 'help' for available commands.\nType \"quit\" or \"exit\" to leave.")
@@ -162,9 +170,12 @@ def run(db):
         elif command.lower().startswith("save-searchids") or command.lower().startswith("save-ids"):
             printSearchIDs(db, command)
 
-        elif command.startswith("print-annual"):
+        elif command.startswith("print-annual") or command.startswith("pa"):
             if len(command.split()) == 3:
                 printYearlyOverlap(db, command.split()[1:])
+
+        elif command.startswith("print-categories") or command.startswith("pc"):
+            printCategories(db, command.split()[1:])
 
         elif command.startswith("help"):
             help()
@@ -180,10 +191,8 @@ Entry point of this file.
 Just connects to the database and calls run
 """
 
-
 def main():
     db = DBManager()
-
     run(db)
 
 

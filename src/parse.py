@@ -114,9 +114,9 @@ Parameters:
     entry: a parsed CSV line as a dictionary. Like one returned from parseCSVLine
 """
 def containsStopWords(entry):
-    stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter', \
-                 'title page', 'program guide', 'program at a glance', 'list of papers', \
-                 'technical program', 'author index', 'tutorial', 'conference program', \
+    stopWords = ['table of content', 'abstract', 'content', 'preface', 'front matter',
+                 'title page', 'program guide', 'program at a glance', 'list of papers',
+                 'technical program', 'author index', 'tutorial', 'conference program',
                  'general session', 'front cover', 'keyword index', "- toc", "book of abstracts"]
 
     if 'Document Title' in entry:
@@ -141,7 +141,7 @@ corresponding Zotero header.
 def zoteroToIEEE(zoteroEntries):
 
     # Dictionary of key, values where the keys are zotero headers and values are IEEE equivalent headers
-    transfers = {"Title" : "Document Title", "Author" : "Authors", "Url" : "PDF Link", "Publication Year" : "Year"}
+    transfers = {"Title": "Document Title", "Author": "Authors", "Url": "PDF Link", "Publication Year": "Year"}
     converted = []
 
     for entry in zoteroEntries:
@@ -191,7 +191,7 @@ def reportToCSV(report):
 """
 Converts a list of lines to a single string
 
-Parameters: 
+Parameters:
     report: a list of lines of text
 
 Returns:

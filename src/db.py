@@ -1,4 +1,3 @@
-
 import sqlite3
 import os
 
@@ -273,6 +272,41 @@ class DBManager:
 				results.append(r)
 
 		return results
+
+	"""
+	Returns a count of overlapping results for 3 categories. Each category is an array of searchID's
+	"""
+	def getCategoryOverlap(self, category1, category2, category3):
+
+		resultsA = []
+		resultsB = []
+		resultsC = []
+		for searchID in category1:
+			resultsA += self.getSearchResults(searchID)
+		for searchID in category2:
+			resultsB += self.getSearchResults(searchID)
+		for searchID in category3:
+			resultsC += self.getSearchResults(searchID)
+
+		ABoverlap = []
+		BCoverlap = []
+		ACoverlap = []
+		ABCoverlap = []
+		for r in resultsA:
+			if r in resultsB:
+				ABoverlap.append(r)
+				if r in resultsC:
+					ABCoverlap.append(r)
+			if r in resultsC:
+				ACoverlap.append(r)
+		for r in resultsB:
+			if r in resultsC:
+				BCoverlap.append(r)
+		print("Overlap results")
+		print("A only: " + str(len(resultsA)) + ", B only: " + str(len(resultsB)) + ", C only: " + str(len(resultsC)))
+		print("A & B: " + str(len(ABoverlap)) + ", A & C: " + str(len(ACoverlap)) + ", B & C: " + str(len(BCoverlap)) +", A & B & C: " + str(len(ABCoverlap)))
+
+		return
 
 	"""
 	Returns a list of publication IDs that are mapped to both given searchIDs in searchpublink for a given year
